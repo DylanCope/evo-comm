@@ -19,7 +19,9 @@ from jaxmarl.wrappers.baselines import MPELogWrapper, JaxMARLWrapper
 import wandb
 import functools
 
-    
+from jaxmarl_utils.callback import TrainerCallback
+
+
 class MPEWorldStateWrapper(JaxMARLWrapper):
     
     @partial(jax.jit, static_argnums=0)
@@ -163,9 +165,10 @@ def unbatchify(x: jnp.ndarray, agent_list, num_envs, num_actors):
 
 class MAPPOTrainer:
 
-    def __init__(self, config, rng):
+    def __init__(self, config: dict):
         self.config = config
-        self.rng = rng
+        self.rng = jax.random.PRNGKey(config["SEED"])
+        self.callback = config.get('callback_cls', TrainerCallback)()
 
         self.env = self._create_env()    
         config["NUM_ACTORS"] = self.env.num_agents * config["NUM_ENVS"]
@@ -206,7 +209,9 @@ class MAPPOTrainer:
             jnp.zeros((1, self.config["NUM_ENVS"])),
         )
         ac_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ENVS"], 128)
-        self.actor_network_params = self.actor_network.init(_rng_actor, ac_init_hstate, ac_init_x)
+        self.actor_network_params = self.actor_network.init(_rng_actor,
+                                                            ac_init_hstate,
+                                                            ac_init_x)
 
         cr_init_x = (
             jnp.zeros((1, self.config["NUM_ENVS"], self.env.world_state_size(),)),  #  + env.observation_space(env.agents[0]).shape[0]
@@ -518,29 +523,20 @@ class MAPPOTrainer:
         train_states = update_state[0]
         metric = traj_batch.info
         rng = update_state[-1]
-
-        def callback(metric):
-            wandb.log(
-                {
-                    "returns": metric["returned_episode_returns"][-1, :].mean(),
-                    "env_step": metric["update_steps"]
-                    * self.config["NUM_ENVS"]
-                    * self.config["NUM_STEPS"],
-                }
-            )
-
         metric["update_steps"] = update_steps
-        jax.experimental.io_callback(callback, None, metric)
+        jax.experimental.io_callback(self.callback.on_iteration_end,
+                                     None, metric)
         update_steps = update_steps + 1
         runner_state = (train_states, env_state, last_obs, last_done, hstates, rng)
         return (runner_state, update_steps), metric
 
-    def train(self):
+    def run(self):
+        self.callback.on_train_begin(self.config)
+        with jax.disable_jit(False):
+            self._train()
+        self.callback.on_train_end()
 
-        self.setup()
-
-        # TRAIN LOOP
-
+    def _create_init_runner_state(self):
         reset_rng = self._next_rng(self.config["NUM_ENVS"])
         obsv, env_state = jax.vmap(self.env.reset, in_axes=(0,))(reset_rng)
         ac_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ACTORS"], 128)
@@ -554,6 +550,13 @@ class MAPPOTrainer:
             (ac_init_hstate, cr_init_hstate),
             self._next_rng(),
         )
+
+        return runner_state
+
+    @partial(jax.jit, static_argnums=0)
+    def _train(self):
+        self.setup()
+        runner_state = self._create_init_runner_state()
         runner_state, metric = jax.lax.scan(
             lambda s, _: self._training_iteration(s),
             (runner_state, 0), None, self.config["NUM_UPDATES"]

@@ -12,7 +12,7 @@ tmp
 sync
 .Trash*
 outputs
-wandb
+wandb/*
 .wandb_api_key
 
 # IDE
