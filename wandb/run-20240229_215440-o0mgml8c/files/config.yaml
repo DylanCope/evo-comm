@@ -1,0 +1,96 @@
+wandb_version: 1
+
+LR:
+  desc: null
+  value: 0.002
+NUM_ENVS:
+  desc: null
+  value: 128
+NUM_STEPS:
+  desc: null
+  value: 128
+TOTAL_TIMESTEPS:
+  desc: null
+  value: 2000000.0
+UPDATE_EPOCHS:
+  desc: null
+  value: 4
+NUM_MINIBATCHES:
+  desc: null
+  value: 4
+GAMMA:
+  desc: null
+  value: 0.99
+GAE_LAMBDA:
+  desc: null
+  value: 0.95
+CLIP_EPS:
+  desc: null
+  value: 0.2
+SCALE_CLIP_EPS:
+  desc: null
+  value: false
+ENT_COEF:
+  desc: null
+  value: 0.01
+VF_COEF:
+  desc: null
+  value: 0.5
+MAX_GRAD_NORM:
+  desc: null
+  value: 0.5
+ACTIVATION:
+  desc: null
+  value: tanh
+ENV_NAME:
+  desc: null
+  value: MPE_simple_spread_v3
+SEED:
+  desc: null
+  value: 1
+NUM_SEEDS:
+  desc: null
+  value: 2
+ENV_KWARGS:
+  desc: null
+  value: {}
+ANNEAL_LR:
+  desc: null
+  value: true
+WANDB_MODE:
+  desc: null
+  value: online
+ENTITY:
+  desc: null
+  value: drcope
+PROJECT:
+  desc: null
+  value: jaxmarl-mpe
+_wandb:
+  desc: null
+  value:
+    python_version: 3.11.5
+    cli_version: 0.16.1
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1709243680.227622
+    t:
+      1:
+      - 12
+      - 45
+      - 50
+      - 55
+      2:
+      - 12
+      - 45
+      - 50
+      - 55
+      3:
+      - 15
+      - 16
+      - 23
+      4: 3.11.5
+      5: 0.16.1
+      8:
+      - 5
+      13: linux-x86_64

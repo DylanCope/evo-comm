@@ -1,0 +1,28 @@
+Error executing job with overrides: []
+Traceback (most recent call last):
+  File "/nas/ucb/dylancope/evo-comm/test_runner.py", line 43, in main
+    train(rng)
+  File "/nas/ucb/dylancope/evo-comm/test_runner.py", line 39, in train
+    out = trainer.train()
+          ^^^^^^^^^^^^^^^
+  File "/nas/ucb/dylancope/evo-comm/jaxmarl_utils/mappo.py", line 546, in train
+    obsv, env_state = jax.vmap(self.env.reset, in_axes=(0,))(reset_rng)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/dylancope/JaxMARL/jaxmarl/wrappers/baselines.py", line 53, in reset
+    obs, env_state = self._env.reset(key)
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/dylancope/evo-comm/jaxmarl_utils/mappo.py", line 28, in reset
+    obs, env_state = self._env.reset(key)
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/dylancope/JaxMARL/jaxmarl/environments/mpe/simple.py", line 268, in reset
+    key_a, key_l = jax.random.split(key)
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/dylancope/miniconda3/lib/python3.11/site-packages/jax/_src/random.py", line 294, in split
+    typed_key, wrapped = _check_prng_key("split", key, error_on_batched=True)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nas/ucb/dylancope/miniconda3/lib/python3.11/site-packages/jax/_src/random.py", line 101, in _check_prng_key
+    raise TypeError(f'unexpected PRNG key type {type(key)}')
+TypeError: unexpected PRNG key type <class 'list'>
+--------------------
+For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.

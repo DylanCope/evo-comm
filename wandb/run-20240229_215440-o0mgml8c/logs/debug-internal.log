@@ -1,0 +1,741 @@
+2024-02-29 21:54:40,227 INFO    StreamThr :1986930 [internal.py:wandb_internal():86] W&B internal server running at pid: 1986930, started at: 2024-02-29 21:54:40.227033
+2024-02-29 21:54:40,235 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status
+2024-02-29 21:54:40,236 INFO    WriterThread:1986930 [datastore.py:open_for_write():85] open: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/run-o0mgml8c.wandb
+2024-02-29 21:54:40,236 DEBUG   SenderThread:1986930 [sender.py:send():382] send: header
+2024-02-29 21:54:40,236 DEBUG   SenderThread:1986930 [sender.py:send():382] send: run
+2024-02-29 21:54:40,725 INFO    SenderThread:1986930 [dir_watcher.py:__init__():211] watching files in: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files
+2024-02-29 21:54:40,725 INFO    SenderThread:1986930 [sender.py:_start_run_threads():1136] run started: o0mgml8c with start time 1709243680.227622
+2024-02-29 21:54:40,729 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: check_version
+2024-02-29 21:54:40,730 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: check_version
+2024-02-29 21:54:40,813 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: run_start
+2024-02-29 21:54:40,843 DEBUG   HandlerThread:1986930 [system_info.py:__init__():32] System info init
+2024-02-29 21:54:40,843 DEBUG   HandlerThread:1986930 [system_info.py:__init__():47] System info init done
+2024-02-29 21:54:40,843 INFO    HandlerThread:1986930 [system_monitor.py:start():194] Starting system monitor
+2024-02-29 21:54:40,844 INFO    SystemMonitor:1986930 [system_monitor.py:_start():158] Starting system asset monitoring threads
+2024-02-29 21:54:40,845 INFO    HandlerThread:1986930 [system_monitor.py:probe():214] Collecting system info
+2024-02-29 21:54:40,845 INFO    SystemMonitor:1986930 [interfaces.py:start():190] Started cpu monitoring
+2024-02-29 21:54:40,845 INFO    SystemMonitor:1986930 [interfaces.py:start():190] Started disk monitoring
+2024-02-29 21:54:40,847 INFO    SystemMonitor:1986930 [interfaces.py:start():190] Started gpu monitoring
+2024-02-29 21:54:40,848 INFO    SystemMonitor:1986930 [interfaces.py:start():190] Started memory monitoring
+2024-02-29 21:54:40,848 INFO    SystemMonitor:1986930 [interfaces.py:start():190] Started network monitoring
+2024-02-29 21:54:40,906 DEBUG   HandlerThread:1986930 [system_info.py:probe():196] Probing system
+2024-02-29 21:54:40,908 DEBUG   HandlerThread:1986930 [gitlib.py:_init_repo():56] git repository is invalid
+2024-02-29 21:54:40,908 DEBUG   HandlerThread:1986930 [system_info.py:probe():244] Probing system done
+2024-02-29 21:54:40,908 DEBUG   HandlerThread:1986930 [system_monitor.py:probe():223] {'os': 'Linux-5.4.0-171-generic-x86_64-with-glibc2.31', 'python': '3.11.5', 'heartbeatAt': '2024-02-29T21:54:40.906721', 'startedAt': '2024-02-29T21:54:40.217465', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/nas/ucb/dylancope/evo-comm/mappo_rnn_mpe.py', 'codePathLocal': 'mappo_rnn_mpe.py', 'codePath': 'mappo_rnn_mpe.py', 'host': 'vae.ist.berkeley.edu', 'username': 'dylancope', 'executable': '/nas/ucb/dylancope/miniconda3/bin/python', 'cpu_count': 128, 'cpu_count_logical': 256, 'cpu_freq': {'current': 2862.413523437502, 'min': 1500.0, 'max': 2450.0}, 'cpu_freq_per_core': [{'current': 3099.628, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.709, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.72, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.278, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.748, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.741, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.599, 'min': 1500.0, 'max': 2450.0}, {'current': 2884.631, 'min': 1500.0, 'max': 2450.0}, {'current': 2712.749, 'min': 1500.0, 'max': 2450.0}, {'current': 3060.948, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.743, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.712, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.731, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.296, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.296, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.497, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.716, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.708, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.74, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.744, 'min': 1500.0, 'max': 2450.0}, {'current': 2793.523, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.735, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.738, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.732, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.743, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.741, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.738, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.311, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.419, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.529, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.744, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.743, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.098, 'min': 1500.0, 'max': 2450.0}, {'current': 2967.258, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.306, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.741, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.738, 'min': 1500.0, 'max': 2450.0}, {'current': 3052.777, 'min': 1500.0, 'max': 2450.0}, {'current': 3098.871, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.601, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.738, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.74, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.736, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.747, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.726, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.096, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.069, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.311, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.531, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.744, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.097, 'min': 1500.0, 'max': 2450.0}, {'current': 3009.278, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.097, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.74, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.315, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.743, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.742, 'min': 1500.0, 'max': 2450.0}, {'current': 2915.119, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.31, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.737, 'min': 1500.0, 'max': 2450.0}, {'current': 2479.562, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.03, 'min': 1500.0, 'max': 2450.0}, {'current': 3098.844, 'min': 1500.0, 'max': 2450.0}, {'current': 3098.826, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.737, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.741, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.528, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.739, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.74, 'min': 1500.0, 'max': 2450.0}, {'current': 2878.122, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.275, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.732, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.719, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.521, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.521, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.732, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.267, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.724, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.743, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.729, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.531, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.53, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.692, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.532, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.531, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.317, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.744, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.711, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.312, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.53, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.531, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.743, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.747, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.532, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.531, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.045, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.526, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.524, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.742, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.708, 'min': 1500.0, 'max': 2450.0}, {'current': 2473.397, 'min': 1500.0, 'max': 2450.0}, {'current': 2474.405, 'min': 1500.0, 'max': 2450.0}, {'current': 2469.876, 'min': 1500.0, 'max': 2450.0}, {'current': 2479.017, 'min': 1500.0, 'max': 2450.0}, {'current': 1499.554, 'min': 1500.0, 'max': 2450.0}, {'current': 1497.584, 'min': 1500.0, 'max': 2450.0}, {'current': 1499.526, 'min': 1500.0, 'max': 2450.0}, {'current': 1494.011, 'min': 1500.0, 'max': 2450.0}, {'current': 1497.425, 'min': 1500.0, 'max': 2450.0}, {'current': 1495.307, 'min': 1500.0, 'max': 2450.0}, {'current': 1494.929, 'min': 1500.0, 'max': 2450.0}, {'current': 1497.015, 'min': 1500.0, 'max': 2450.0}, {'current': 1497.118, 'min': 1500.0, 'max': 2450.0}, {'current': 1496.491, 'min': 1500.0, 'max': 2450.0}, {'current': 1497.075, 'min': 1500.0, 'max': 2450.0}, {'current': 1502.755, 'min': 1500.0, 'max': 2450.0}, {'current': 1498.088, 'min': 1500.0, 'max': 2450.0}, {'current': 1495.155, 'min': 1500.0, 'max': 2450.0}, {'current': 1496.147, 'min': 1500.0, 'max': 2450.0}, {'current': 1496.25, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.616, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.71, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.384, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.308, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.743, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.74, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.736, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.628, 'min': 1500.0, 'max': 2450.0}, {'current': 2920.316, 'min': 1500.0, 'max': 2450.0}, {'current': 2711.552, 'min': 1500.0, 'max': 2450.0}, {'current': 2899.687, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.733, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.678, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.74, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.302, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.291, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.38, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.735, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.71, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.744, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 2745.606, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.744, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.753, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.732, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.401, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.748, 'min': 1500.0, 'max': 2450.0}, {'current': 3098.595, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.243, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.51, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.744, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 3098.878, 'min': 1500.0, 'max': 2450.0}, {'current': 2801.62, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.308, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.738, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.741, 'min': 1500.0, 'max': 2450.0}, {'current': 3091.347, 'min': 1500.0, 'max': 2450.0}, {'current': 3098.945, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.474, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.744, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.744, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.701, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.724, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.093, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.093, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.307, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.75, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.091, 'min': 1500.0, 'max': 2450.0}, {'current': 2706.631, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.09, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.26, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.743, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.739, 'min': 1500.0, 'max': 2450.0}, {'current': 2774.305, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.303, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.74, 'min': 1500.0, 'max': 2450.0}, {'current': 2479.72, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.382, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.296, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.048, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.741, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.741, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.444, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.741, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.303, 'min': 1500.0, 'max': 2450.0}, {'current': 2877.19, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.252, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.74, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.514, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.527, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.201, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.732, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.268, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.736, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.723, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.739, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.744, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.524, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.525, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.691, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.527, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.529, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.526, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.307, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.71, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.309, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.527, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.525, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.745, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.528, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.528, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.021, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.743, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.522, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.746, 'min': 1500.0, 'max': 2450.0}, {'current': 3099.71, 'min': 1500.0, 'max': 2450.0}, {'current': 2473.786, 'min': 1500.0, 'max': 2450.0}, {'current': 2477.142, 'min': 1500.0, 'max': 2450.0}, {'current': 2476.725, 'min': 1500.0, 'max': 2450.0}, {'current': 2474.176, 'min': 1500.0, 'max': 2450.0}, {'current': 1500.932, 'min': 1500.0, 'max': 2450.0}, {'current': 1496.038, 'min': 1500.0, 'max': 2450.0}, {'current': 1497.863, 'min': 1500.0, 'max': 2450.0}, {'current': 1499.213, 'min': 1500.0, 'max': 2450.0}, {'current': 1496.117, 'min': 1500.0, 'max': 2450.0}, {'current': 1497.089, 'min': 1500.0, 'max': 2450.0}, {'current': 1496.92, 'min': 1500.0, 'max': 2450.0}, {'current': 1491.565, 'min': 1500.0, 'max': 2450.0}, {'current': 1496.194, 'min': 1500.0, 'max': 2450.0}, {'current': 1496.787, 'min': 1500.0, 'max': 2450.0}, {'current': 1496.981, 'min': 1500.0, 'max': 2450.0}, {'current': 1499.466, 'min': 1500.0, 'max': 2450.0}, {'current': 1499.451, 'min': 1500.0, 'max': 2450.0}, {'current': 1496.214, 'min': 1500.0, 'max': 2450.0}, {'current': 1497.775, 'min': 1500.0, 'max': 2450.0}, {'current': 1495.793, 'min': 1500.0, 'max': 2450.0}], 'disk': {'/': {'total': 7085.547592163086, 'used': 975.3685493469238}}, 'gpu': 'NVIDIA RTX A4000', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA RTX A4000', 'memory_total': 17171480576}], 'memory': {'total': 1007.7530326843262}}
+2024-02-29 21:54:40,909 INFO    HandlerThread:1986930 [system_monitor.py:probe():224] Finished collecting system info
+2024-02-29 21:54:40,909 INFO    HandlerThread:1986930 [system_monitor.py:probe():227] Publishing system info
+2024-02-29 21:54:40,909 DEBUG   HandlerThread:1986930 [system_info.py:_save_pip():52] Saving list of pip packages installed into the current environment
+2024-02-29 21:54:40,910 DEBUG   HandlerThread:1986930 [system_info.py:_save_pip():68] Saving pip packages done
+2024-02-29 21:54:40,910 DEBUG   HandlerThread:1986930 [system_info.py:_save_conda():75] Saving list of conda packages installed into the current environment
+2024-02-29 21:54:41,727 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_created():271] file/dir created: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/requirements.txt
+2024-02-29 21:54:41,727 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_created():271] file/dir created: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/conda-environment.yaml
+2024-02-29 21:54:44,991 DEBUG   HandlerThread:1986930 [system_info.py:_save_conda():87] Saving conda packages done
+2024-02-29 21:54:44,993 INFO    HandlerThread:1986930 [system_monitor.py:probe():229] Finished publishing system info
+2024-02-29 21:54:44,995 DEBUG   SenderThread:1986930 [sender.py:send():382] send: files
+2024-02-29 21:54:44,995 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-metadata.json with policy now
+2024-02-29 21:54:45,000 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: stop_status
+2024-02-29 21:54:45,001 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: stop_status
+2024-02-29 21:54:45,003 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: internal_messages
+2024-02-29 21:54:45,108 DEBUG   SenderThread:1986930 [sender.py:send():382] send: telemetry
+2024-02-29 21:54:45,355 INFO    wandb-upload_0:1986930 [upload_job.py:push():131] Uploaded file /tmp/tmpsqac4c2pwandb/35zvyeu4-wandb-metadata.json
+2024-02-29 21:54:45,728 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/conda-environment.yaml
+2024-02-29 21:54:45,729 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_created():271] file/dir created: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-metadata.json
+2024-02-29 21:54:46,109 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:54:51,110 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:54:56,111 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:00,001 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: internal_messages
+2024-02-29 21:55:00,002 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: stop_status
+2024-02-29 21:55:00,002 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: stop_status
+2024-02-29 21:55:01,193 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:06,194 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:11,198 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:15,001 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: stop_status
+2024-02-29 21:55:15,001 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: internal_messages
+2024-02-29 21:55:16,396 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: stop_status
+2024-02-29 21:55:16,747 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/config.yaml
+2024-02-29 21:55:21,612 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:26,613 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:30,002 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: stop_status
+2024-02-29 21:55:30,002 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: stop_status
+2024-02-29 21:55:30,044 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: internal_messages
+2024-02-29 21:55:31,464 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:31,465 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:31,465 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:31,468 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:31,755 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_created():271] file/dir created: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:31,803 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:31,804 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:31,804 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:31,805 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:31,805 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:32,145 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:32,145 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:32,146 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:32,146 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:32,486 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:32,487 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:32,487 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:32,488 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:32,756 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:32,827 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:32,828 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:32,828 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:32,829 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:33,170 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:33,171 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:33,171 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:33,172 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:33,512 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:33,512 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:33,513 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:33,515 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:33,757 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:33,854 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:33,854 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:33,855 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:33,855 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:34,196 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:34,196 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:34,196 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:34,197 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:34,537 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:34,537 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:34,537 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:34,538 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:34,757 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:34,877 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:34,878 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:34,878 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:34,879 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:35,218 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:35,219 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:35,219 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:35,220 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:35,559 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:35,560 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:35,560 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:35,562 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:35,758 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:35,899 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:35,900 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:35,900 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:35,901 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:36,240 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:36,241 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:36,241 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:36,242 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:36,581 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:36,582 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:36,582 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:36,583 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:36,759 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:36,922 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:36,923 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:36,923 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:36,923 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:36,924 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:37,261 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:37,262 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:37,262 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:37,263 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:37,600 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:37,601 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:37,601 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:37,603 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:37,759 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:37,939 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:37,940 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:37,940 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:37,941 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:38,278 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:38,279 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:38,279 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:38,280 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:38,619 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:38,620 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:38,620 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:38,621 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:38,760 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:38,959 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:38,959 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:38,960 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:38,960 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:39,298 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:39,299 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:39,299 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:39,300 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:39,637 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:39,637 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:39,637 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:39,640 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:39,760 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:39,975 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:39,976 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:39,976 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:39,977 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:40,314 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:40,314 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:40,315 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:40,316 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:40,653 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:40,653 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:40,654 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:40,655 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:40,761 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:40,849 DEBUG   SystemMonitor:1986930 [system_monitor.py:_start():172] Starting system metrics aggregation loop
+2024-02-29 21:55:40,852 DEBUG   SenderThread:1986930 [sender.py:send():382] send: stats
+2024-02-29 21:55:40,992 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:40,992 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:40,992 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:40,993 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:41,330 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:41,331 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:41,331 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:41,332 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:41,669 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:41,670 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:41,670 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:41,671 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:41,761 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:42,009 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:42,010 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:42,010 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:42,011 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:42,011 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:42,351 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:42,351 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:42,351 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:42,352 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:42,690 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:42,690 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:42,690 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:42,691 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:42,762 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:43,028 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:43,029 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:43,029 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:43,030 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:43,369 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:43,369 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:43,369 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:43,370 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:43,708 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:43,709 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:43,709 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:43,710 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:43,763 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:44,048 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:44,048 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:44,049 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:44,049 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:44,387 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:44,388 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:44,388 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:44,389 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:44,726 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:44,726 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:44,726 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:44,727 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:44,763 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:45,002 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: stop_status
+2024-02-29 21:55:45,002 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: internal_messages
+2024-02-29 21:55:45,003 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: stop_status
+2024-02-29 21:55:45,064 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:45,105 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:45,105 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:45,106 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:45,403 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:45,404 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:45,404 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:45,406 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:45,743 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:45,743 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:45,744 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:45,745 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:45,764 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:46,083 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:46,083 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:46,083 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:46,085 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:46,422 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:46,423 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:46,423 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:46,425 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:46,762 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:46,763 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:46,763 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:46,764 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:46,764 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:47,101 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:47,102 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:47,102 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:47,102 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:47,103 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:47,441 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:47,442 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:47,442 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:47,442 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:47,765 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:47,780 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:47,781 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:47,781 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:47,782 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:48,120 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:48,121 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:48,121 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:48,122 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:48,461 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:48,462 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:48,462 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:48,463 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:48,766 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:48,801 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:48,802 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:48,802 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:48,803 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:49,142 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:49,142 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:49,143 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:49,143 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:49,481 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:49,482 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:49,482 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:49,483 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:49,766 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:49,821 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:49,821 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:49,821 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:49,825 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:50,160 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:50,161 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:50,161 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:50,162 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:50,500 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:50,501 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:50,501 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:50,502 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:50,767 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:50,840 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:50,840 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:50,841 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:50,842 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:51,179 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:51,180 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:51,180 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:51,181 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:51,518 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:51,519 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:51,519 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:51,524 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:51,767 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:51,858 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:51,858 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:51,858 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:51,860 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:52,197 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:52,198 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:52,198 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:52,198 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:52,199 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:52,537 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:52,538 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:52,538 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:52,539 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:52,768 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:52,877 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:52,878 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:52,878 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:52,879 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:53,218 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:53,218 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:53,218 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:53,219 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:53,558 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:53,559 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:53,559 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:53,560 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:53,769 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:53,899 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:53,899 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:53,899 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:53,900 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:54,238 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:54,239 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:54,239 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:54,240 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:54,579 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:54,579 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:54,579 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:54,580 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:54,770 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:54,919 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:54,919 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:54,919 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:54,921 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:55,260 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:55,260 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:55,261 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:55,262 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:55,600 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:55,601 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:55,601 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:55,602 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:55,770 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:55,941 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:55,942 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:55,942 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:55,943 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:56,282 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:56,283 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:56,284 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:56,285 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:56,626 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:56,626 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:56,626 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:56,627 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:56,771 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:56,965 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:56,965 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:56,966 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:56,967 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:57,305 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:57,306 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:57,306 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:57,306 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:55:57,308 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:57,646 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:57,647 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:57,647 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:57,649 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:57,772 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:57,988 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:57,989 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:57,989 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:57,990 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:58,329 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:58,329 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:58,330 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:58,331 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:58,670 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:58,671 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:58,671 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:58,672 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:58,772 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:55:59,012 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:59,013 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:59,013 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:59,014 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:59,354 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:59,354 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:59,355 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:59,355 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:59,695 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:55:59,696 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:55:59,696 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:55:59,697 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:55:59,773 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:00,002 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: stop_status
+2024-02-29 21:56:00,002 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: internal_messages
+2024-02-29 21:56:00,003 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: stop_status
+2024-02-29 21:56:00,036 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:00,105 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:00,105 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:00,108 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:00,378 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:00,379 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:00,379 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:00,380 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:00,719 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:00,720 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:00,720 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:00,721 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:00,774 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:01,060 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:01,061 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:01,061 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:01,062 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:01,401 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:01,402 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:01,402 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:01,403 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:01,742 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:01,746 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:01,746 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:01,747 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:01,774 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:02,084 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:02,084 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:02,084 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:02,085 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:02,425 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:02,425 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:02,426 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:02,426 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:56:02,427 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:02,767 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:02,767 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:02,767 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:02,769 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:02,775 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:03,108 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:03,109 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:03,109 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:03,110 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:03,450 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:03,451 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:03,451 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:03,452 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:03,775 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:03,792 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:03,793 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:03,793 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:03,794 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:04,133 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:04,134 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:04,134 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:04,135 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:04,475 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:04,475 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:04,475 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:04,476 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:04,776 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:04,816 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:04,816 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:04,816 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:04,818 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:05,157 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:05,158 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:05,158 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:05,159 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:05,498 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:05,499 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:05,499 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:05,500 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:05,777 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:05,839 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:05,840 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:05,840 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:05,841 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:06,180 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:06,181 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:06,181 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:06,183 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:06,521 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:06,522 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:06,522 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:06,523 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:06,777 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:06,863 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:06,864 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:06,864 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:06,865 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:07,207 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:07,207 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:07,207 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:07,208 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:07,550 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:07,551 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:07,551 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:07,551 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:56:07,552 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:07,778 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:07,895 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:07,895 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:07,895 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:07,897 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:08,239 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:08,240 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:08,240 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:08,241 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:08,583 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:08,584 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:08,584 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:08,585 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:08,779 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:08,928 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:08,929 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:08,929 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:08,931 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:09,272 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:09,272 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:09,272 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:09,273 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:09,615 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:09,616 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:09,616 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:09,617 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:09,779 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:09,959 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:09,959 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:09,960 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:09,961 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:10,302 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:10,303 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:10,303 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:10,306 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:10,646 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:10,647 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:10,647 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:10,648 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:10,780 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:10,856 DEBUG   SenderThread:1986930 [sender.py:send():382] send: stats
+2024-02-29 21:56:10,990 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:10,991 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:10,991 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:10,992 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:11,334 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:11,334 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:11,335 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:11,335 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:11,677 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:11,678 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:11,678 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:11,678 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:11,780 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:12,020 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:12,021 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:12,021 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:12,022 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:12,363 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:12,364 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:12,364 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:12,365 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:12,708 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: partial_history
+2024-02-29 21:56:12,709 DEBUG   SenderThread:1986930 [sender.py:send():382] send: history
+2024-02-29 21:56:12,709 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: summary_record
+2024-02-29 21:56:12,709 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:56:12,710 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:12,762 DEBUG   SenderThread:1986930 [sender.py:send():382] send: exit
+2024-02-29 21:56:12,762 INFO    SenderThread:1986930 [sender.py:send_exit():589] handling exit code: 0
+2024-02-29 21:56:12,762 INFO    SenderThread:1986930 [sender.py:send_exit():591] handling runtime: 91
+2024-02-29 21:56:12,763 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:12,763 INFO    SenderThread:1986930 [sender.py:send_exit():597] send defer
+2024-02-29 21:56:12,763 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:12,763 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 0
+2024-02-29 21:56:12,763 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:12,763 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 0
+2024-02-29 21:56:12,763 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 1
+2024-02-29 21:56:12,763 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:12,763 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 1
+2024-02-29 21:56:12,763 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:12,764 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 1
+2024-02-29 21:56:12,764 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 2
+2024-02-29 21:56:12,764 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:12,764 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 2
+2024-02-29 21:56:12,764 INFO    HandlerThread:1986930 [system_monitor.py:finish():203] Stopping system monitor
+2024-02-29 21:56:12,764 DEBUG   SystemMonitor:1986930 [system_monitor.py:_start():179] Finished system metrics aggregation loop
+2024-02-29 21:56:12,764 DEBUG   SystemMonitor:1986930 [system_monitor.py:_start():183] Publishing last batch of metrics
+2024-02-29 21:56:12,764 INFO    HandlerThread:1986930 [interfaces.py:finish():202] Joined cpu monitor
+2024-02-29 21:56:12,766 INFO    HandlerThread:1986930 [interfaces.py:finish():202] Joined disk monitor
+2024-02-29 21:56:12,781 INFO    Thread-12 :1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:13,057 INFO    HandlerThread:1986930 [interfaces.py:finish():202] Joined gpu monitor
+2024-02-29 21:56:13,058 INFO    HandlerThread:1986930 [interfaces.py:finish():202] Joined memory monitor
+2024-02-29 21:56:13,058 INFO    HandlerThread:1986930 [interfaces.py:finish():202] Joined network monitor
+2024-02-29 21:56:13,058 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:13,058 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 2
+2024-02-29 21:56:13,058 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 3
+2024-02-29 21:56:13,058 DEBUG   SenderThread:1986930 [sender.py:send():382] send: stats
+2024-02-29 21:56:13,058 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:13,059 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 3
+2024-02-29 21:56:13,059 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:13,059 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 3
+2024-02-29 21:56:13,059 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 4
+2024-02-29 21:56:13,059 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:13,059 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 4
+2024-02-29 21:56:13,060 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:13,060 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 4
+2024-02-29 21:56:13,060 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 5
+2024-02-29 21:56:13,060 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:13,060 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 5
+2024-02-29 21:56:13,060 DEBUG   SenderThread:1986930 [sender.py:send():382] send: summary
+2024-02-29 21:56:13,061 INFO    SenderThread:1986930 [sender.py:_save_file():1392] saving file wandb-summary.json with policy end
+2024-02-29 21:56:13,061 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:13,061 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 5
+2024-02-29 21:56:13,061 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 6
+2024-02-29 21:56:13,061 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:13,061 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 6
+2024-02-29 21:56:13,061 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:13,061 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 6
+2024-02-29 21:56:13,061 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 7
+2024-02-29 21:56:13,061 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: status_report
+2024-02-29 21:56:13,061 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:13,062 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 7
+2024-02-29 21:56:13,062 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:13,062 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 7
+2024-02-29 21:56:13,062 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 8
+2024-02-29 21:56:13,062 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:13,062 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 8
+2024-02-29 21:56:13,062 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:13,062 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 8
+2024-02-29 21:56:13,062 INFO    SenderThread:1986930 [job_builder.py:build():298] Attempting to build job artifact
+2024-02-29 21:56:13,063 INFO    SenderThread:1986930 [job_builder.py:_get_source_type():439] no source found
+2024-02-29 21:56:13,063 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 9
+2024-02-29 21:56:13,063 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:13,063 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 9
+2024-02-29 21:56:13,063 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:13,063 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 9
+2024-02-29 21:56:13,063 INFO    SenderThread:1986930 [dir_watcher.py:finish():358] shutting down directory watcher
+2024-02-29 21:56:13,762 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: poll_exit
+2024-02-29 21:56:13,782 INFO    SenderThread:1986930 [dir_watcher.py:_on_file_modified():288] file/dir modified: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:13,783 INFO    SenderThread:1986930 [dir_watcher.py:finish():388] scan: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files
+2024-02-29 21:56:13,783 INFO    SenderThread:1986930 [dir_watcher.py:finish():402] scan save: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/config.yaml config.yaml
+2024-02-29 21:56:13,783 INFO    SenderThread:1986930 [dir_watcher.py:finish():402] scan save: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json wandb-summary.json
+2024-02-29 21:56:13,785 INFO    SenderThread:1986930 [dir_watcher.py:finish():402] scan save: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/requirements.txt requirements.txt
+2024-02-29 21:56:13,786 INFO    SenderThread:1986930 [dir_watcher.py:finish():402] scan save: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/conda-environment.yaml conda-environment.yaml
+2024-02-29 21:56:13,787 INFO    SenderThread:1986930 [dir_watcher.py:finish():402] scan save: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-metadata.json wandb-metadata.json
+2024-02-29 21:56:13,788 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 10
+2024-02-29 21:56:13,788 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: poll_exit
+2024-02-29 21:56:13,788 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:13,790 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 10
+2024-02-29 21:56:13,791 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:13,792 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 10
+2024-02-29 21:56:13,792 INFO    SenderThread:1986930 [file_pusher.py:finish():175] shutting down file pusher
+2024-02-29 21:56:14,028 INFO    wandb-upload_1:1986930 [upload_job.py:push():131] Uploaded file /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/wandb-summary.json
+2024-02-29 21:56:14,075 INFO    wandb-upload_0:1986930 [upload_job.py:push():131] Uploaded file /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/config.yaml
+2024-02-29 21:56:14,137 INFO    wandb-upload_3:1986930 [upload_job.py:push():131] Uploaded file /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/conda-environment.yaml
+2024-02-29 21:56:14,139 INFO    wandb-upload_2:1986930 [upload_job.py:push():131] Uploaded file /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/files/requirements.txt
+2024-02-29 21:56:14,340 INFO    Thread-11 (_thread_body):1986930 [sender.py:transition_state():617] send defer: 11
+2024-02-29 21:56:14,340 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:14,340 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 11
+2024-02-29 21:56:14,341 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:14,341 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 11
+2024-02-29 21:56:14,341 INFO    SenderThread:1986930 [file_pusher.py:join():181] waiting for file pusher
+2024-02-29 21:56:14,341 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 12
+2024-02-29 21:56:14,341 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:14,341 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 12
+2024-02-29 21:56:14,341 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:14,341 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 12
+2024-02-29 21:56:14,341 INFO    SenderThread:1986930 [file_stream.py:finish():595] file stream finish called
+2024-02-29 21:56:14,599 INFO    SenderThread:1986930 [file_stream.py:finish():599] file stream finish is done
+2024-02-29 21:56:14,599 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 13
+2024-02-29 21:56:14,599 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:14,599 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 13
+2024-02-29 21:56:14,600 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:14,600 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 13
+2024-02-29 21:56:14,600 INFO    SenderThread:1986930 [sender.py:transition_state():617] send defer: 14
+2024-02-29 21:56:14,605 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: defer
+2024-02-29 21:56:14,605 INFO    HandlerThread:1986930 [handler.py:handle_request_defer():172] handle defer: 14
+2024-02-29 21:56:14,605 DEBUG   SenderThread:1986930 [sender.py:send():382] send: final
+2024-02-29 21:56:14,605 DEBUG   SenderThread:1986930 [sender.py:send():382] send: footer
+2024-02-29 21:56:14,605 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: defer
+2024-02-29 21:56:14,605 INFO    SenderThread:1986930 [sender.py:send_request_defer():613] handle sender defer: 14
+2024-02-29 21:56:14,605 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: poll_exit
+2024-02-29 21:56:14,606 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: poll_exit
+2024-02-29 21:56:14,606 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: poll_exit
+2024-02-29 21:56:14,606 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: poll_exit
+2024-02-29 21:56:14,607 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: server_info
+2024-02-29 21:56:14,607 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: server_info
+2024-02-29 21:56:14,608 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: get_summary
+2024-02-29 21:56:14,609 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: sampled_history
+2024-02-29 21:56:14,609 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: internal_messages
+2024-02-29 21:56:14,609 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: job_info
+2024-02-29 21:56:14,665 DEBUG   SenderThread:1986930 [sender.py:send_request():409] send_request: job_info
+2024-02-29 21:56:14,665 INFO    MainThread:1986930 [wandb_run.py:_footer_history_summary_info():3837] rendering history
+2024-02-29 21:56:14,666 INFO    MainThread:1986930 [wandb_run.py:_footer_history_summary_info():3869] rendering summary
+2024-02-29 21:56:14,666 INFO    MainThread:1986930 [wandb_run.py:_footer_sync_info():3796] logging synced files
+2024-02-29 21:56:14,666 DEBUG   HandlerThread:1986930 [handler.py:handle_request():146] handle_request: shutdown
+2024-02-29 21:56:14,666 INFO    HandlerThread:1986930 [handler.py:finish():866] shutting down handler
+2024-02-29 21:56:15,610 INFO    WriterThread:1986930 [datastore.py:close():294] close: /nas/ucb/dylancope/evo-comm/wandb/run-20240229_215440-o0mgml8c/run-o0mgml8c.wandb
+2024-02-29 21:56:15,665 INFO    SenderThread:1986930 [sender.py:finish():1548] shutting down sender
+2024-02-29 21:56:15,665 INFO    SenderThread:1986930 [file_pusher.py:finish():175] shutting down file pusher
+2024-02-29 21:56:15,666 INFO    SenderThread:1986930 [file_pusher.py:join():181] waiting for file pusher

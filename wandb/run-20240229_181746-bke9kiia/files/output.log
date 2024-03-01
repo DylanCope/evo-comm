@@ -1,0 +1,16 @@
+Error executing job with overrides: []
+Traceback (most recent call last):
+  File "/nas/ucb/dylancope/evo-comm/test_runner.py", line 43, in main
+    train(rng)
+  File "/nas/ucb/dylancope/evo-comm/test_runner.py", line 39, in train
+    out = trainer.train()
+          ^^^^^^^^^^^^^^^
+  File "/nas/ucb/dylancope/evo-comm/jaxmarl_utils/mappo.py", line 543, in train
+    self.setup()
+  File "/nas/ucb/dylancope/evo-comm/jaxmarl_utils/mappo.py", line 264, in setup
+    self.init_env()
+    ^^^^^^^^^^^^^
+AttributeError: 'MAPPOTrainer' object has no attribute 'init_env'
+--------------------
+For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+Set the environment variable HYDRA_FULL_ERROR=1 for a complete stack trace.
