@@ -28,6 +28,7 @@ class MPEWorldStateWrapper(JaxMARLWrapper):
     def reset(self,
               key):
         obs, env_state = self._env.reset(key)
+        obs = self.pad_longest(obs)
         obs["world_state"] = self.world_state(obs)
         return obs, env_state
     
@@ -39,8 +40,20 @@ class MPEWorldStateWrapper(JaxMARLWrapper):
         obs, env_state, reward, done, info = self._env.step(
             key, state, action
         )
+        obs = self.pad_longest(obs)
         obs["world_state"] = self.world_state(obs)
         return obs, env_state, reward, done, info
+
+
+    @partial(jax.jit, static_argnums=0)
+    def pad_longest(self, obs):
+        
+        longest_len = max([obs[agent].shape[-1] for agent in self._env.agents])
+
+        def pad(x):
+            return jnp.pad(x, ((0, longest_len - x.shape[-1])))
+
+        return {agent: pad(obs[agent]) for agent in self._env.agents}
 
     @partial(jax.jit, static_argnums=0)
     def world_state(self, obs):
@@ -54,13 +67,18 @@ class MPEWorldStateWrapper(JaxMARLWrapper):
             robs = robs.flatten()
             return robs
             
-        all_obs = jnp.array([obs[agent] for agent in self._env.agents]).flatten()
+        all_obs = jnp.concatenate([obs[agent].flatten() for agent in self._env.agents])
         all_obs = jnp.expand_dims(all_obs, axis=0).repeat(self._env.num_agents, axis=0)
         return all_obs
-    
+
+    def get_agent_obs_dim(self):
+        return max([self._env.observation_space(agent).shape[-1] for agent in self._env.agents])
+
     def world_state_size(self):
-        spaces = [self._env.observation_space(agent) for agent in self._env.agents]
-        return sum([space.shape[-1] for space in spaces])
+        # spaces = [self._env.observation_space(agent) for agent in self._env.agents]
+        # return sum([space.shape[-1] for space in spaces])
+        max_space_dim = max([self._env.observation_space(agent).shape[-1] for agent in self._env.agents])
+        return max_space_dim * self._env.num_agents
 
 class ScannedRNN(nn.Module):
     @functools.partial(
@@ -205,7 +223,8 @@ class MAPPOTrainer:
         _rng_actor, _rng_critic = self._next_rng(2)
         ac_init_x = (
             jnp.zeros((1, self.config["NUM_ENVS"],
-                       self.env.observation_space(self.env.agents[0]).shape[0])),
+                    #    self.env.observation_space(self.env.agents[0]).shape[0])),
+                       self.env.get_agent_obs_dim())),
             jnp.zeros((1, self.config["NUM_ENVS"])),
         )
         ac_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ENVS"], 128)
@@ -278,7 +297,13 @@ class MAPPOTrainer:
                 obs_batch[np.newaxis, :],
                 last_done[np.newaxis, :],
             )
-            ac_hstate, pi = self.actor_network.apply(train_states[0].params, hstates[0], ac_in)
+
+            ac_train_state, cr_train_state, *_ = train_states
+            ac_hstate, cr_hstate = hstates
+
+            ac_hstate, pi = self.actor_network.apply(ac_train_state.params,
+                                                     ac_hstate,
+                                                     ac_in)
             action = pi.sample(seed=_rng)
             log_prob = pi.log_prob(action)
             env_act = unbatchify(
@@ -291,8 +316,8 @@ class MAPPOTrainer:
                 world_state[None, :],
                 last_done[np.newaxis, :],
             )
-            cr_hstate, value = self.critic_network.apply(train_states[1].params,
-                                                         hstates[1],
+            cr_hstate, value = self.critic_network.apply(cr_train_state.params,
+                                                         cr_hstate,
                                                          cr_in)
 
             # STEP ENV
@@ -495,7 +520,8 @@ class MAPPOTrainer:
         # COLLECT TRAJECTORIES
         runner_state, update_steps = update_runner_state
         
-        initial_hstates, runner_state, traj_batch = self._collect_trajectories(runner_state, update_steps)
+        initial_hstates, runner_state, traj_batch = self._collect_trajectories(runner_state,
+                                                                               update_steps)
 
         train_states, env_state, last_obs, last_done, hstates, rng = runner_state
 

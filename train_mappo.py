@@ -14,10 +14,8 @@ from jaxmarl_utils.mappo import MAPPOTrainer
             config_path="config",
             config_name="mappo_homogenous_rnn_mpe")
 def main(config):
-
     config = OmegaConf.to_container(config)
     config['callback_cls'] = WandbCallback
-
     trainer = MAPPOTrainer(config)
     trainer.run()
     

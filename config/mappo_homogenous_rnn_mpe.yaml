@@ -12,7 +12,7 @@
 "VF_COEF": 0.5
 "MAX_GRAD_NORM": 0.5
 "ACTIVATION": "tanh"
-"ENV_NAME": "MPE_simple_v3"
+"ENV_NAME": "MPE_simple_speaker_listener_v4"
 "SEED": 1
 "NUM_SEEDS": 2
 "ENV_KWARGS": {}
