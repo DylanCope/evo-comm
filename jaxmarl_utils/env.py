@@ -1,32 +1,34 @@
 import jax
 import jax.numpy as jnp
-import numpy as onp
 from jaxmarl.environments.multi_agent_env import MultiAgentEnv
 from jaxmarl.environments.mpe.default_params import *
 import chex
-from gymnax.environments.spaces import Box, Discrete
+from gymnax.environments.spaces import Discrete, Box
 from flax import struct
-from typing import Tuple, Optional, Dict
+
+from typing import List, Tuple, Dict
 from functools import partial
 
-import matplotlib.pyplot as plt
-import matplotlib
 
 
 @struct.dataclass
 class State:
-    """Basic MPE State"""
-
     agent_pos: chex.Array  # [n_agents, [x, y]]
     prey_pos: chex.Array  # [n_prey, [x, y]]
     c: chex.Array  # communication state [n_agents + n_prey,]  (int32)
     done: chex.Array  # bool [num_agents, ]
     step: int  # current step
+    prey_captured: int  # number of prey captured throughout the game
 
 
-ENV_ACTIONS = [
-    'noop', 'up', 'down', 'left', 'right'
-]
+class GridAction:
+    N_ACTIONS = 5
+
+    NOOP = 0
+    UP = 1
+    DOWN = 2
+    LEFT = 3
+    RIGHT = 4
 
 
 class CommEnvGridworld(MultiAgentEnv):
@@ -39,7 +41,8 @@ class CommEnvGridworld(MultiAgentEnv):
                  n_agent_only_sounds: int = 2,
                  n_prey_only_sounds: int = 2,
                  prey_vision_range: int = 1,
-                 prey_sound_range: int = 3,
+                 prey_sound_range: int = 5,
+                 prey_noise_prob: float = 0.25,
                  max_steps: int = 50,
                  agents_to_capture_prey: int = 2,
                  capture_reward: float = 10.0,
@@ -53,6 +56,7 @@ class CommEnvGridworld(MultiAgentEnv):
         self.n_prey_only_sounds = n_prey_only_sounds
         self.prey_sound_range = prey_sound_range
         self.prey_vision_range = prey_vision_range
+        self.prey_noise_prob = prey_noise_prob
         self.max_steps = max_steps
         self.agents_to_capture_prey = agents_to_capture_prey
         self.capture_reward = capture_reward
@@ -63,16 +67,38 @@ class CommEnvGridworld(MultiAgentEnv):
         ]
 
         self.action_spaces = {
-            agent: Discrete(len(ENV_ACTIONS) + self.n_sounds)
+            agent: Discrete(GridAction.N_ACTIONS + self.n_sounds)
             for agent in self.agents
+        }
+
+        obs, _ = self.reset(jax.random.PRNGKey(0))
+
+        self.observation_spaces = {
+            agent: Box(-1.0, 1.0, shape=agent_obs.shape)
+            for agent, agent_obs in obs.items()
         }
 
     @property
     def n_sounds(self):
-        return (
+        # first sound is special silent symbol
+        return 1 + (
             self.n_overlapping_sounds +
             self.n_agent_only_sounds +
             self.n_prey_only_sounds
+        )
+
+    @property
+    def n_prey_sounds(self):
+        return (
+            self.n_overlapping_sounds +
+            self.n_prey_only_sounds
+        )
+
+    @property
+    def n_agent_sounds(self):
+        return (
+            self.n_overlapping_sounds +
+            self.n_agent_only_sounds
         )
 
     @partial(jax.jit, static_argnums=(0,))
@@ -91,19 +117,50 @@ class CommEnvGridworld(MultiAgentEnv):
             c=jnp.zeros((self.n_agents + self.n_prey,), dtype=jnp.int32),
             done=jnp.full((self.n_agents), False),
             step=0,
+            prey_captured=0
         )
 
         return self.get_obs(state), state
+
+    def _create_sound_feats(self, state: State, agent_idx: int) -> jnp.ndarray:
+        agent_pos = state.agent_pos[agent_idx]
+        features = []
+        for axis in range(2):
+            axis_sound_feat = jnp.zeros((self.n_sounds,))
+
+            for other_agent_idx in range(self.n_agents):
+                if agent_idx != other_agent_idx:
+                    sound_idx = state.c[other_agent_idx]
+                    other_agent_sound = jax.nn.one_hot(sound_idx,
+                                                       self.n_sounds)
+                    is_silent_sound = sound_idx == 0
+                    other_agent_pos = state.agent_pos[other_agent_idx]
+                    axis_factor = jnp.sign(agent_pos[axis] - other_agent_pos[axis])
+                    axis_sound_feat = axis_sound_feat + (
+                        (1.0 - is_silent_sound) * axis_factor * other_agent_sound
+                    )
+
+            for prey_idx in range(self.n_prey):
+                sound_idx = state.c[self.n_agents + prey_idx]
+                prey_sound = jax.nn.one_hot(sound_idx, self.n_sounds)
+                is_silent_sound = sound_idx == 0
+                prey_pos = state.prey_pos[prey_idx]
+                prey_dist = jnp.sum(jnp.abs(agent_pos - prey_pos))
+                in_audible_range = prey_dist <= self.prey_sound_range
+                axis_factor = jnp.sign(agent_pos[axis] - prey_pos[axis])
+                axis_sound_feat = axis_sound_feat + (
+                    (1.0 - is_silent_sound) * in_audible_range * axis_factor * prey_sound
+                )
+
+            features.append(axis_sound_feat)
+
+        return jnp.concatenate(features)
 
     def get_agent_obs(self, state: State, agent: str) -> jnp.ndarray:
         features = []
 
         agent_idx = self.agents.index(agent)
         agent_pos = state.agent_pos[agent_idx]
-        # agent_pos_1h = jnp.zeros((self.grid_size * 2,))
-        # print(agent_pos[0])
-        # agent_pos_1h = agent_pos_1h.at(agent_pos[0]).set(1)
-        # agent_pos_1h = agent_pos_1h.at(self.grid_size + agent_pos[1]).set(1)
 
         agent_pos_1h = jax.nn.one_hot(agent_pos, self.grid_size).flatten()
 
@@ -115,32 +172,25 @@ class CommEnvGridworld(MultiAgentEnv):
             prey_pos_1h = is_visible_mask * jax.nn.one_hot(prey_pos, self.grid_size).flatten()
             features.append(prey_pos_1h)
 
-
-        for axis in range(2):
-            axis_sound_feat = jnp.zeros((self.n_sounds,))
-
-            for other_agent_idx in range(self.n_agents):
-                if agent_idx != other_agent_idx:
-                    other_agent_sound = jax.nn.one_hot(state.c[other_agent_idx], self.n_sounds)
-                    other_agent_pos = state.agent_pos[other_agent_idx]
-                    axis_factor = jnp.sign(agent_pos[axis] - other_agent_pos[axis])
-                    axis_sound_feat = axis_sound_feat + axis_factor * other_agent_sound
-    
-            for prey_idx in range(self.n_prey):
-                prey_sound = jax.nn.one_hot(state.c[self.n_agents + prey_idx], self.n_sounds)
-                prey_pos = state.prey_pos[prey_idx]
-                axis_factor = jnp.sign(agent_pos[axis] - prey_pos[axis])
-                axis_sound_feat = axis_sound_feat + axis_factor * prey_sound
-
-            features.append(axis_sound_feat)
+        features.append(self._create_sound_feats(state, agent_idx))
 
         return jnp.concatenate(features)
 
-    def step_env(
-        self, key: chex.PRNGKey, state: State, actions: Dict[str, chex.Array]
-    ) -> Tuple[Dict[str, chex.Array], State, Dict[str, float], Dict[str, bool], Dict]:
-        """Environment-specific step transition."""
-        pass
+    def convert_agent_action_to_sound(self, action: jnp.array) -> jnp.array:
+        return jnp.clip(action - GridAction.N_ACTIONS, 0, self.n_agent_sounds)
+
+    def update_sound_state(self, key: chex.PRNGKey, actions: Dict[str, chex.Array]) -> chex.Array:
+        agent_sounds = jnp.array([
+            self.convert_agent_action_to_sound(a)
+            for a in actions.values()
+        ])
+        key, noise_k1, noise_k2 = jax.random.split(key, 3)
+        prey_sounds = (
+            jax.random.bernoulli(noise_k1, self.prey_noise_prob, (5,))
+            * jax.random.randint(noise_k2, (5,), 0, self.n_prey_sounds + 1)  # inclusive high
+        )
+
+        return jnp.concatenate([agent_sounds, prey_sounds])
 
     def get_obs(self, state: State) -> Dict[str, chex.Array]:
         """Applies observation function to state."""
@@ -149,9 +199,100 @@ class CommEnvGridworld(MultiAgentEnv):
             for agent in self.agents
         }
 
+    def _compute_new_agent_positions(self,
+                                     state: State,
+                                     actions: Dict[str, chex.Array]) -> List[chex.Array]:
+
+        new_agent_positions = []
+        for agent in self.agents:
+            agent_idx = self.agents.index(agent)
+            agent_pos = state.agent_pos[agent_idx]
+            action = actions[agent]
+
+            UP_DELTA = jnp.array([0, 1])
+            DOWN_DELTA = jnp.array([0, -1])
+            LEFT_DELTA = jnp.array([-1, 0])
+            RIGHT_DELTA = jnp.array([1, 0])
+
+            up_mask = action == GridAction.UP
+            down_mask = action == GridAction.DOWN
+            left_mask = action == GridAction.LEFT
+            right_mask = action == GridAction.RIGHT
+
+            new_agent_pos = agent_pos + (
+                up_mask * UP_DELTA +
+                down_mask * DOWN_DELTA +
+                left_mask * LEFT_DELTA +
+                right_mask * RIGHT_DELTA
+            )
+            new_agent_positions.append(new_agent_pos)
+    
+        return new_agent_positions
+
+    def step_env(
+        self, key: chex.PRNGKey, state: State, actions: Dict[str, chex.Array]
+    ) -> Tuple[Dict[str, chex.Array], State, Dict[str, float], Dict[str, bool], Dict]:
+        """Environment-specific step transition."""
+        key, sound_key = jax.random.split(key)
+        new_sound_state = self.update_sound_state(sound_key, actions)
+
+        new_agent_positions = self._compute_new_agent_positions(state, actions)
+        new_agent_positions = jnp.concatenate(new_agent_positions)
+
+        reward = jnp.ones((1,)) * (-self.time_penalty)
+        total_prey_captured = state.prey_captured.copy()
+
+        new_prey_positions = []
+        for prey_pos in state.prey_pos:
+            n_agent_on_prey = jnp.sum(jnp.apply_along_axis(
+                lambda x: jnp.all(x == prey_pos), 1, new_agent_positions
+            ))
+            prey_captured = n_agent_on_prey >= self.agents_to_capture_prey
+            total_prey_captured = total_prey_captured + prey_captured
+            reward = reward + prey_captured * self.capture_reward
+            key, new_prey_pos_key = jax.random.split(key)
+            new_prey_pos = prey_pos * (1 - prey_captured) + (
+                prey_captured * jax.random.randint(
+                    new_prey_pos_key, (2,), 0, self.grid_size
+                )
+            )
+            new_prey_positions.append(new_prey_pos)
+
+        new_prey_positions = jnp.concatenate(new_prey_positions)
+
+        next_step = state.step + 1
+
+        new_state = State(
+            agent_pos=new_agent_positions,
+            prey_pos=new_prey_positions,
+            c=new_sound_state,
+            done=jnp.full((self.n_agents), next_step >= self.max_steps),
+            step=next_step,
+        )
+
+        return self.get_obs(new_state), new_state, reward, new_state.done, {}
+
 
 if __name__ == '__main__':
     env = CommEnvGridworld()
+
     key = jax.random.PRNGKey(0)
-    obs, state = env.reset(key)
+    key, reset_key = jax.random.split(key)
+    obs, state = env.reset(reset_key)
+
+    print(state)
+    print(obs)
+
+    action_keys = jax.random.split(key, env.n_agents)
+    actions = {
+        agent: env.action_spaces[agent].sample(k)
+        for agent, k in zip(env.agents, action_keys)
+    }
+    print(actions)
+
+    key, step_key = jax.random.split(key)
+
+    obs, state, reward, dones, infos = env.step(step_key, state, actions)
+
+    print(state)
     print(obs)
