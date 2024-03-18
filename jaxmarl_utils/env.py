@@ -110,22 +110,29 @@ class CommEnvGridworld(MultiAgentEnv):
         features.append(agent_pos_1h)
 
         for prey_pos in state.prey_pos:
-            if jnp.sum(jnp.abs(agent_pos - prey_pos)) <= self.prey_vision_range:
-                prey_pos_1h = jax.nn.one_hot(prey_pos, self.grid_size).flatten()
-            else:
-                prey_pos_1h = jnp.zeros((self.grid_size * 2,))
+            manhattan_dist = jnp.sum(jnp.abs(agent_pos - prey_pos))
+            is_visible_mask = manhattan_dist <= self.prey_vision_range
+            prey_pos_1h = is_visible_mask * jax.nn.one_hot(prey_pos, self.grid_size).flatten()
             features.append(prey_pos_1h)
 
+
         for axis in range(2):
-            sound = jnp.zeros((self.n_sounds,))
+            axis_sound_feat = jnp.zeros((self.n_sounds,))
+
             for other_agent_idx in range(self.n_agents):
-                agent_sound = state.c[other_agent_idx]
-                if agent_idx != other_agent_idx and agent_sound > 0:
+                if agent_idx != other_agent_idx:
+                    other_agent_sound = jax.nn.one_hot(state.c[other_agent_idx], self.n_sounds)
                     other_agent_pos = state.agent_pos[other_agent_idx]
                     axis_factor = jnp.sign(agent_pos[axis] - other_agent_pos[axis])
-                    sound = sound.at(agent_sound).set(axis_factor)
+                    axis_sound_feat = axis_sound_feat + axis_factor * other_agent_sound
     
-        features.append(sound.flatten())
+            for prey_idx in range(self.n_prey):
+                prey_sound = jax.nn.one_hot(state.c[self.n_agents + prey_idx], self.n_sounds)
+                prey_pos = state.prey_pos[prey_idx]
+                axis_factor = jnp.sign(agent_pos[axis] - prey_pos[axis])
+                axis_sound_feat = axis_sound_feat + axis_factor * prey_sound
+
+            features.append(axis_sound_feat)
 
         return jnp.concatenate(features)
 
