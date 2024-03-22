@@ -5,9 +5,9 @@ import hydra
 from omegaconf import OmegaConf
 
 import wandb
-from jaxmarl_utils.callback import WandbCallback
+from jaxevocomm.callback import WandbCallback
 
-from jaxmarl_utils.mappo import MAPPOTrainer
+from jaxevocomm.mappo import MAPPOTrainer
 
 
 @hydra.main(version_base=None,

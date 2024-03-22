@@ -10,13 +10,11 @@ from typing import List, Tuple, Dict
 from functools import partial
 
 
-
 @struct.dataclass
 class State:
     agent_pos: chex.Array  # [n_agents, [x, y]]
     prey_pos: chex.Array  # [n_prey, [x, y]]
     c: chex.Array  # communication state [n_agents + n_prey,]  (int32)
-    done: chex.Array  # bool [num_agents, ]
     step: int  # current step
     prey_captured: int  # number of prey captured throughout the game
 
@@ -67,7 +65,7 @@ class CommEnvGridworld(MultiAgentEnv):
         ]
 
         self.action_spaces = {
-            agent: Discrete(GridAction.N_ACTIONS + self.n_sounds)
+            agent: Discrete(GridAction.N_ACTIONS + self.n_agent_sounds)
             for agent in self.agents
         }
 
@@ -115,7 +113,6 @@ class CommEnvGridworld(MultiAgentEnv):
             agent_pos=agent_pos,
             prey_pos=prey_pos,
             c=jnp.zeros((self.n_agents + self.n_prey,), dtype=jnp.int32),
-            done=jnp.full((self.n_agents), False),
             step=0,
             prey_captured=0
         )
@@ -186,8 +183,8 @@ class CommEnvGridworld(MultiAgentEnv):
         ])
         key, noise_k1, noise_k2 = jax.random.split(key, 3)
         prey_sounds = (
-            jax.random.bernoulli(noise_k1, self.prey_noise_prob, (5,))
-            * jax.random.randint(noise_k2, (5,), 0, self.n_prey_sounds + 1)  # inclusive high
+            jax.random.bernoulli(noise_k1, self.prey_noise_prob, (self.n_prey,))
+            * jax.random.randint(noise_k2, (self.n_prey,), 0, self.n_prey_sounds + 1)
         )
 
         return jnp.concatenate([agent_sounds, prey_sounds])
@@ -199,9 +196,9 @@ class CommEnvGridworld(MultiAgentEnv):
             for agent in self.agents
         }
 
-    def _compute_new_agent_positions(self,
-                                     state: State,
-                                     actions: Dict[str, chex.Array]) -> List[chex.Array]:
+    def _move_agents(self,
+                     state: State,
+                     actions: Dict[str, chex.Array]) -> List[chex.Array]:
 
         new_agent_positions = []
         for agent in self.agents:
@@ -227,7 +224,7 @@ class CommEnvGridworld(MultiAgentEnv):
             )
             new_agent_positions.append(new_agent_pos)
     
-        return new_agent_positions
+        return jnp.vstack(new_agent_positions)
 
     def step_env(
         self, key: chex.PRNGKey, state: State, actions: Dict[str, chex.Array]
@@ -236,8 +233,7 @@ class CommEnvGridworld(MultiAgentEnv):
         key, sound_key = jax.random.split(key)
         new_sound_state = self.update_sound_state(sound_key, actions)
 
-        new_agent_positions = self._compute_new_agent_positions(state, actions)
-        new_agent_positions = jnp.concatenate(new_agent_positions)
+        new_agent_positions = self._move_agents(state, actions)
 
         reward = jnp.ones((1,)) * (-self.time_penalty)
         total_prey_captured = state.prey_captured.copy()
@@ -258,19 +254,22 @@ class CommEnvGridworld(MultiAgentEnv):
             )
             new_prey_positions.append(new_prey_pos)
 
-        new_prey_positions = jnp.concatenate(new_prey_positions)
+        new_prey_positions = jnp.vstack(new_prey_positions)
 
         next_step = state.step + 1
 
-        new_state = State(
+        new_state = state.replace(
             agent_pos=new_agent_positions,
             prey_pos=new_prey_positions,
             c=new_sound_state,
-            done=jnp.full((self.n_agents), next_step >= self.max_steps),
             step=next_step,
         )
 
-        return self.get_obs(new_state), new_state, reward, new_state.done, {}
+        done = jnp.full((self.n_agents), state.step >= self.max_steps)
+        dones = {a: done[i] for i, a in enumerate(self.agents)}
+        dones.update({"__all__": jnp.all(done)})
+
+        return self.get_obs(new_state), new_state, reward, dones, {}
 
 
 if __name__ == '__main__':
@@ -288,7 +287,7 @@ if __name__ == '__main__':
         agent: env.action_spaces[agent].sample(k)
         for agent, k in zip(env.agents, action_keys)
     }
-    print(actions)
+    print('Actions:', actions)
 
     key, step_key = jax.random.split(key)
 

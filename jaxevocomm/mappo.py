@@ -19,7 +19,7 @@ from jaxmarl.wrappers.baselines import MPELogWrapper, JaxMARLWrapper
 import wandb
 import functools
 
-from jaxmarl_utils.callback import TrainerCallback
+from jaxevocomm.callback import TrainerCallback
 
 
 class MPEWorldStateWrapper(JaxMARLWrapper):
