@@ -29,7 +29,7 @@ class GridAction:
     RIGHT = 4
 
 
-class CommEnvGridworld(MultiAgentEnv):
+class MimicryCommEnvGridworld(MultiAgentEnv):
 
     def __init__(self,
                  grid_size: int = 10,
@@ -273,7 +273,7 @@ class CommEnvGridworld(MultiAgentEnv):
 
 
 if __name__ == '__main__':
-    env = CommEnvGridworld()
+    env = MimicryCommEnvGridworld()
 
     key = jax.random.PRNGKey(0)
     key, reset_key = jax.random.split(key)
