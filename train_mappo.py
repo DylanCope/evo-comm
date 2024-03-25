@@ -18,6 +18,7 @@ def main(config):
     config['callback_cls'] = WandbCallback
     trainer = MAPPOTrainer(config)
     trainer.run()
-    
+
+
 if __name__=="__main__":
     main()

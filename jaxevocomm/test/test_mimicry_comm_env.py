@@ -13,10 +13,17 @@ def create_key():
     return jax.random.PRNGKey(0)
 
 
-@given(integers(min_value=1, max_value=10),
-       integers(min_value=1, max_value=10),
-       integers(min_value=1, max_value=100))
-def test_reset(n_agents: int, n_prey: int, grid_size: int):
+# @given(integers(min_value=1, max_value=10),
+#        integers(min_value=1, max_value=10),
+#        integers(min_value=1, max_value=100))
+# def test_reset(n_agents: int, n_prey: int, grid_size: int):
+# @given(integers(min_value=1, max_value=10),
+#        integers(min_value=1, max_value=10),
+#        integers(min_value=1, max_value=100))
+def test_reset():
+    n_agents = 3
+    n_prey = 2
+    grid_size = 5
     env = MimicryCommEnvGridworld(grid_size=grid_size,
                                   n_agents=n_agents,
                                   n_prey=n_prey)

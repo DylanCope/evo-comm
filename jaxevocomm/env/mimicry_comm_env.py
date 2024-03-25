@@ -112,7 +112,8 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
         state = State(
             agent_pos=agent_pos,
             prey_pos=prey_pos,
-            c=jnp.zeros((self.n_agents + self.n_prey,), dtype=jnp.int32),
+            c=jnp.zeros((self.n_agents + self.n_prey,),
+                        dtype=jnp.int32),
             step=0,
             prey_captured=0
         )
@@ -177,16 +178,30 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
         return jnp.clip(action - GridAction.N_ACTIONS, 0, self.n_agent_sounds)
 
     def update_sound_state(self, key: chex.PRNGKey, actions: Dict[str, chex.Array]) -> chex.Array:
+        # Get agent sounds from actions
         agent_sounds = jnp.array([
             self.convert_agent_action_to_sound(a)
             for a in actions.values()
         ])
+
+        # Create prey Sounds
         key, noise_k1, noise_k2 = jax.random.split(key, 3)
+
+        # Prey randomly create one of their possible sounds
+        # The prey_noise_prob is the probability that a prey will make a sound
+        # If it makes a sound, it will choose one of the sounds from 1 to
+        # n_prey_sounds with equal probability
         prey_sounds = (
             jax.random.bernoulli(noise_k1, self.prey_noise_prob, (self.n_prey,))
-            * jax.random.randint(noise_k2, (self.n_prey,), 0, self.n_prey_sounds + 1)
+            * jax.random.randint(noise_k2, (self.n_prey,), 1, self.n_prey_sounds + 1)
         )
+        
+        # Agent and prey sounds need to be in the same alphabet, so we add
+        # the number of agent only sounds to the prey sounds 
+        is_making_sound = prey_sounds != 0
+        prey_sounds = (prey_sounds + self.n_agent_only_sounds) * is_making_sound
 
+        # final sound state is concatenation of agent and prey sounds
         return jnp.concatenate([agent_sounds, prey_sounds])
 
     def get_obs(self, state: State) -> Dict[str, chex.Array]:
@@ -222,6 +237,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
                 left_mask * LEFT_DELTA +
                 right_mask * RIGHT_DELTA
             )
+            new_agent_pos = jnp.clip(new_agent_pos, 0, self.grid_size - 1)
             new_agent_positions.append(new_agent_pos)
     
         return jnp.vstack(new_agent_positions)
@@ -282,16 +298,18 @@ if __name__ == '__main__':
     print(state)
     print(obs)
 
-    action_keys = jax.random.split(key, env.n_agents)
-    actions = {
-        agent: env.action_spaces[agent].sample(k)
-        for agent, k in zip(env.agents, action_keys)
-    }
-    print('Actions:', actions)
+    for _ in range(10):
+        action_keys = jax.random.split(key, env.n_agents)
+        actions = {
+            agent: env.action_spaces[agent].sample(k)
+            for agent, k in zip(env.agents, action_keys)
+        }
+        print('Actions:', actions)
 
-    key, step_key = jax.random.split(key)
+        key, step_key = jax.random.split(key)
 
-    obs, state, reward, dones, infos = env.step(step_key, state, actions)
+        obs, state, reward, dones, infos = env.step(step_key, state, actions)
 
-    print(state)
-    print(obs)
+        print(state)
+        print(obs)
+        print(dones)
