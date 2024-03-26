@@ -128,7 +128,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
 
     def _create_sound_feats(self,
                             state: State,
-                            agent_idx: int) -> Dict[str, jnp.ndarray]:
+                            agent_idx: int) -> Dict[str, chex.Array]:
         """
         Creates sound features for a given agent.
 
@@ -212,22 +212,30 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
 
         return features
 
+    def get_agent_obs(self, state: State, agent: str) -> chex.Array:
+        """Applies observation function to state."""
+        obs_feat = self._get_agent_obs_feats(state, agent)
+        feats = list(obs_feat.values())
+        return jnp.concatenate(feats)
+
     def get_obs(self, state: State) -> Dict[str, chex.Array]:
         """Applies observation function to state."""
         return {
-            agent: jnp.concatenate(self._get_agent_obs_feats(state, agent).values())
+            agent: self.get_agent_obs(state, agent)
             for agent in self.agents
         }
 
-    def convert_agent_action_to_sound(self, action: jnp.array) -> jnp.array:
+    def convert_agent_action_to_sound(self, action: chex.Array) -> chex.Array:
         return jnp.clip(action - GridAction.N_ACTIONS, 0, self.n_agent_sounds)
 
-    def update_sound_state(self, key: chex.PRNGKey, actions: Dict[str, chex.Array]) -> chex.Array:
+    def update_sound_state(self,
+                           key: chex.PRNGKey,
+                           actions: Dict[str, chex.Array]) -> chex.Array:
         # Get agent sounds from actions
         agent_sounds = jnp.array([
             self.convert_agent_action_to_sound(a)
             for a in actions.values()
-        ])
+        ]).squeeze()
 
         # Create prey Sounds
         key, noise_k1, noise_k2 = jax.random.split(key, 3)
@@ -292,7 +300,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
         # if agents have chosen movement actions, update positions
         new_agent_positions = self._move_agents(state, actions)
 
-        reward = jnp.ones((1,)) * (-self.time_penalty)
+        reward = -self.time_penalty
         total_prey_captured = state.prey_captured.copy()
 
         new_prey_positions = []
@@ -302,7 +310,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
             ))
             prey_captured = n_agent_on_prey >= self.agents_to_capture_prey
             total_prey_captured = total_prey_captured + prey_captured
-            reward = reward + prey_captured * self.capture_reward
+            reward = reward + prey_captured.squeeze() * self.capture_reward
 
             # randomly move prey to a new position if captured
             key, new_prey_pos_key = jax.random.split(key)
@@ -328,14 +336,20 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
             prey_captured=total_prey_captured
         )
 
-        done = jnp.full((self.n_agents), next_step >= self.max_steps)
-        dones = {a: done[i] for i, a in enumerate(self.agents)}
-        dones.update({"__all__": jnp.all(done)})
+        obs = self.get_obs(new_state)
+        info = {}
 
-        return self.get_obs(new_state), new_state, reward, dones, {}
+        done = next_step >= self.max_steps
+        dones = {a: done for a in self.agents}
+        dones.update({"__all__": done})
+
+        rewards = {a: reward for a in self.agents}
+
+        return obs, new_state, rewards, dones, info
 
 
 if __name__ == '__main__':
+
     env = MimicryCommEnvGridworld()
 
     key = jax.random.PRNGKey(0)

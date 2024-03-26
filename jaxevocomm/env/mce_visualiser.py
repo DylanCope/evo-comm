@@ -168,9 +168,8 @@ if __name__ == '__main__':
 
         key, step_key = jax.random.split(key)
 
-        obs, state, reward, dones, infos = env.step(step_key, state, actions)
-        print(reward)
-        total_rewards += sum(reward)
+        obs, state, rewards, dones, infos = env.step(step_key, state, actions)
+        total_rewards += sum(rewards.values())
 
         states.append(state)
         progbar.update()
@@ -178,8 +177,7 @@ if __name__ == '__main__':
     progbar.close()
     print(f"Finished running MCE for {STEPS} steps.")
     print(f"Total rewards: {total_rewards}")
-    print(dones)
-    print(state)
+    print('Final state:', state)
 
     from pathlib import Path
     tmp_dir = Path('tmp')

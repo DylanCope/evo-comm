@@ -9,7 +9,6 @@ from functools import partial
 import jax
 import jax.numpy as jnp
 import optax
-import jaxmarl
 from flax.training.train_state import TrainState
 from jaxmarl.environments.multi_agent_env import MultiAgentEnv
 
@@ -190,6 +189,7 @@ class MAPPOTrainer:
             obsv, env_state, reward, done, info = jax.vmap(
                 self.env.step, in_axes=(0, 0, 0)
             )(rng_step, env_state, env_act)
+
             info = jax.tree_map(lambda x: x.reshape((self.config["NUM_ACTORS"])), info)
             done_batch = batchify(done, self.env.agents, self.config["NUM_ACTORS"]).squeeze()
             transition = Transition(
@@ -203,7 +203,10 @@ class MAPPOTrainer:
                 world_state,
                 info,
             )
-            runner_state = (train_states, env_state, obsv, done_batch, (ac_hstate, cr_hstate), rng)
+            runner_state = (
+                train_states, env_state, obsv,
+                done_batch, (ac_hstate, cr_hstate), rng
+            )
             return runner_state, transition
 
         initial_hstates = runner_state[-2]

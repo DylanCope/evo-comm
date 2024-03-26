@@ -5,8 +5,8 @@ from functools import partial
 from jaxmarl.wrappers.baselines import JaxMARLWrapper
 
 
-class MPEWorldStateWrapper(JaxMARLWrapper):
-    
+class MAPPOWorldStateWrapper(JaxMARLWrapper):
+
     @partial(jax.jit, static_argnums=0)
     def reset(self,
               key):
@@ -30,7 +30,9 @@ class MPEWorldStateWrapper(JaxMARLWrapper):
     @partial(jax.jit, static_argnums=0)
     def pad_longest(self, obs):
         
-        longest_len = max([obs[agent].shape[-1] for agent in self._env.agents])
+        longest_len = max([
+            obs[agent].shape[-1] for agent in self._env.agents
+        ])
 
         def pad(x):
             return jnp.pad(x, ((0, longest_len - x.shape[-1])))
@@ -48,16 +50,24 @@ class MPEWorldStateWrapper(JaxMARLWrapper):
             robs = jnp.roll(all_obs, -aidx, axis=0)
             robs = robs.flatten()
             return robs
-            
-        all_obs = jnp.concatenate([obs[agent].flatten() for agent in self._env.agents])
-        all_obs = jnp.expand_dims(all_obs, axis=0).repeat(self._env.num_agents, axis=0)
+
+        all_obs = jnp.concatenate([
+            obs[agent].flatten() for agent in self._env.agents
+        ])
+        all_obs = jnp.expand_dims(all_obs, axis=0)
+        all_obs = all_obs.repeat(self._env.num_agents, axis=0)
+
         return all_obs
 
     def get_agent_obs_dim(self):
-        return max([self._env.observation_space(agent).shape[-1] for agent in self._env.agents])
+        return max([
+            self._env.observation_space(agent).shape[-1]
+            for agent in self._env.agents
+        ])
 
     def world_state_size(self):
-        # spaces = [self._env.observation_space(agent) for agent in self._env.agents]
-        # return sum([space.shape[-1] for space in spaces])
-        max_space_dim = max([self._env.observation_space(agent).shape[-1] for agent in self._env.agents])
+        max_space_dim = max([
+            self._env.observation_space(agent).shape[-1]
+            for agent in self._env.agents
+        ])
         return max_space_dim * self._env.num_agents
