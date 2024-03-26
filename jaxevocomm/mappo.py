@@ -2,162 +2,22 @@
 Based on PureJaxRL Implementation of IPPO, with changes to give a centralised critic.
 """
 
+import numpy as np
+from typing import List, NamedTuple, Dict
+from functools import partial
+
 import jax
 import jax.numpy as jnp
-import flax.linen as nn
-import numpy as np
 import optax
-from flax.linen.initializers import constant, orthogonal
-from typing import Sequence, NamedTuple, Dict
-
-from flax.training.train_state import TrainState
-import distrax
-from functools import partial
 import jaxmarl
-from jaxmarl.wrappers.baselines import MPELogWrapper, JaxMARLWrapper
-
-import wandb
-import functools
+from flax.training.train_state import TrainState
+from jaxmarl.environments.multi_agent_env import MultiAgentEnv
 
 from jaxevocomm.callback import TrainerCallback
+from jaxevocomm.models.scanned_rnn import ScannedRNN
+from jaxevocomm.models.actor_rnn import ActorRNN
+from jaxevocomm.models.critic_rnn import CriticRNN
 
-
-class MPEWorldStateWrapper(JaxMARLWrapper):
-    
-    @partial(jax.jit, static_argnums=0)
-    def reset(self,
-              key):
-        obs, env_state = self._env.reset(key)
-        obs = self.pad_longest(obs)
-        obs["world_state"] = self.world_state(obs)
-        return obs, env_state
-    
-    @partial(jax.jit, static_argnums=0)
-    def step(self,
-             key,
-             state,
-             action):
-        obs, env_state, reward, done, info = self._env.step(
-            key, state, action
-        )
-        obs = self.pad_longest(obs)
-        obs["world_state"] = self.world_state(obs)
-        return obs, env_state, reward, done, info
-
-
-    @partial(jax.jit, static_argnums=0)
-    def pad_longest(self, obs):
-        
-        longest_len = max([obs[agent].shape[-1] for agent in self._env.agents])
-
-        def pad(x):
-            return jnp.pad(x, ((0, longest_len - x.shape[-1])))
-
-        return {agent: pad(obs[agent]) for agent in self._env.agents}
-
-    @partial(jax.jit, static_argnums=0)
-    def world_state(self, obs):
-        """ 
-        For each agent: [agent obs, all other agent obs]
-        """
-        
-        @partial(jax.vmap, in_axes=(0, None))
-        def _roll_obs(aidx, all_obs):
-            robs = jnp.roll(all_obs, -aidx, axis=0)
-            robs = robs.flatten()
-            return robs
-            
-        all_obs = jnp.concatenate([obs[agent].flatten() for agent in self._env.agents])
-        all_obs = jnp.expand_dims(all_obs, axis=0).repeat(self._env.num_agents, axis=0)
-        return all_obs
-
-    def get_agent_obs_dim(self):
-        return max([self._env.observation_space(agent).shape[-1] for agent in self._env.agents])
-
-    def world_state_size(self):
-        # spaces = [self._env.observation_space(agent) for agent in self._env.agents]
-        # return sum([space.shape[-1] for space in spaces])
-        max_space_dim = max([self._env.observation_space(agent).shape[-1] for agent in self._env.agents])
-        return max_space_dim * self._env.num_agents
-
-class ScannedRNN(nn.Module):
-    @functools.partial(
-        nn.scan,
-        variable_broadcast="params",
-        in_axes=0,
-        out_axes=0,
-        split_rngs={"params": False},
-    )
-    @nn.compact
-    def __call__(self, carry, x):
-        """Applies the module."""
-        rnn_state = carry
-        ins, resets = x
-        rnn_state = jnp.where(
-            resets[:, np.newaxis],
-            self.initialize_carry(ins.shape[0], ins.shape[1]),
-            rnn_state,
-        )
-        new_rnn_state, y = nn.GRUCell(features=ins.shape[1])(rnn_state, ins)
-        return new_rnn_state, y
-
-    @staticmethod
-    def initialize_carry(batch_size, hidden_size):
-        # Use a dummy key since the default state init fn is just zeros.
-        cell = nn.GRUCell(features=hidden_size)
-        return cell.initialize_carry(jax.random.PRNGKey(0), (batch_size, hidden_size))
-
-
-class ActorRNN(nn.Module):
-    action_dim: Sequence[int]
-    config: Dict
-
-    @nn.compact
-    def __call__(self, hidden, x):
-        obs, dones = x
-        embedding = nn.Dense(
-            128, kernel_init=orthogonal(np.sqrt(2)), bias_init=constant(0.0)
-        )(obs)
-        embedding = nn.relu(embedding)
-
-        rnn_in = (embedding, dones)
-        hidden, embedding = ScannedRNN()(hidden, rnn_in)
-
-        actor_mean = nn.Dense(128, kernel_init=orthogonal(2), bias_init=constant(0.0))(
-            embedding
-        )
-        actor_mean = nn.relu(actor_mean)
-        action_logits = nn.Dense(
-            self.action_dim, kernel_init=orthogonal(0.01), bias_init=constant(0.0)
-        )(actor_mean)
-
-        pi = distrax.Categorical(logits=action_logits)
-
-        return hidden, pi
-
-
-class CriticRNN(nn.Module):
-    
-    @nn.compact
-    def __call__(self, hidden, x):
-        world_state, dones = x
-        embedding = nn.Dense(
-            128, kernel_init=orthogonal(np.sqrt(2)), bias_init=constant(0.0)
-        )(world_state)
-        embedding = nn.relu(embedding)
-        
-        rnn_in = (embedding, dones)
-        hidden, embedding = ScannedRNN()(hidden, rnn_in)
-        
-        critic = nn.Dense(128, kernel_init=orthogonal(2), bias_init=constant(0.0))(
-            embedding
-        )
-        critic = nn.relu(critic)
-        critic = nn.Dense(1, kernel_init=orthogonal(1.0), bias_init=constant(0.0))(
-            critic
-        )
-        
-        return hidden, jnp.squeeze(critic, axis=-1)
 
 class Transition(NamedTuple):
     global_done: jnp.ndarray
@@ -171,24 +31,32 @@ class Transition(NamedTuple):
     info: jnp.ndarray
 
 
-def batchify(x: dict, agent_list, num_actors):
-    x = jnp.stack([x[a] for a in agent_list])
+def batchify(x: Dict[str, jnp.ndarray],
+             agent_ids: List[str],
+             num_actors: int) -> jnp.ndarray:
+    x = jnp.stack([x[a] for a in agent_ids])
     return x.reshape((num_actors, -1))
 
 
-def unbatchify(x: jnp.ndarray, agent_list, num_envs, num_actors):
+def unbatchify(x: jnp.ndarray,
+               agent_ids: List[str],
+               num_envs: int,
+               num_actors: int) -> Dict[str, jnp.ndarray]:
     x = x.reshape((num_actors, num_envs, -1))
-    return {a: x[i] for i, a in enumerate(agent_list)}
+    return {a: x[i] for i, a in enumerate(agent_ids)}
 
 
 class MAPPOTrainer:
 
-    def __init__(self, config: dict):
+    def __init__(self,
+                 env: MultiAgentEnv,
+                 config: dict,
+                 callback: TrainerCallback = None):
         self.config = config
         self.rng = jax.random.PRNGKey(config["SEED"])
-        self.callback = config.get('callback_cls', TrainerCallback)()
+        self.callback = callback or TrainerCallback()
+        self.env = env    
 
-        self.env = self._create_env()    
         config["NUM_ACTORS"] = self.env.num_agents * config["NUM_ENVS"]
         config["NUM_UPDATES"] = (
             config["TOTAL_TIMESTEPS"] // config["NUM_STEPS"] // config["NUM_ENVS"]
@@ -196,7 +64,9 @@ class MAPPOTrainer:
         config["MINIBATCH_SIZE"] = (
             config["NUM_ACTORS"] * config["NUM_STEPS"] // config["NUM_MINIBATCHES"]
         )
-        config["CLIP_EPS"] = config["CLIP_EPS"] / self.env.num_agents if config["SCALE_CLIP_EPS"] else config["CLIP_EPS"]
+
+        if config["SCALE_CLIP_EPS"]:
+            config["CLIP_EPS"] = config["CLIP_EPS"] / self.env.num_agents
 
     def _next_rng(self, n: int = 1):
         self.rng, _rng = jax.random.split(self.rng)
@@ -204,13 +74,6 @@ class MAPPOTrainer:
             return _rng
 
         return jax.random.split(_rng, n)
-
-    def _create_env(self):
-        env = jaxmarl.make(self.config["ENV_NAME"],
-                           **self.config["ENV_KWARGS"])
-        env = MPEWorldStateWrapper(env)
-        env = MPELogWrapper(env)
-        return env
 
     @property
     def action_space_dim(self):
@@ -323,6 +186,7 @@ class MAPPOTrainer:
             # STEP ENV
             rng, _rng = jax.random.split(rng)
             rng_step = jax.random.split(_rng, self.config["NUM_ENVS"])
+
             obsv, env_state, reward, done, info = jax.vmap(
                 self.env.step, in_axes=(0, 0, 0)
             )(rng_step, env_state, env_act)

@@ -17,6 +17,7 @@ def wandb_try_login():
     with open('secrets/wandb_api.key', 'r') as key_file:
         key = key_file.read()
         wandb.login(key=key)
+        print("Logged in to wandb using secrets/wandb_api_key.")
 
 
 class WandbCallback(TrainerCallback):

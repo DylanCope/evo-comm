@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
     STEPS = 50
 
-    env = MimicryCommEnvGridworld()
+    env = MimicryCommEnvGridworld(2)
 
     progbar = tqdm.tqdm(range(STEPS), desc='Running MCE', unit='step')
 
@@ -157,6 +157,7 @@ if __name__ == '__main__':
     progbar.update()
 
     states = [state]
+    total_rewards = 0
 
     for step in range(STEPS):
         action_keys = jax.random.split(key, env.n_agents)
@@ -168,12 +169,17 @@ if __name__ == '__main__':
         key, step_key = jax.random.split(key)
 
         obs, state, reward, dones, infos = env.step(step_key, state, actions)
+        print(reward)
+        total_rewards += sum(reward)
 
         states.append(state)
         progbar.update()
 
     progbar.close()
     print(f"Finished running MCE for {STEPS} steps.")
+    print(f"Total rewards: {total_rewards}")
+    print(dones)
+    print(state)
 
     from pathlib import Path
     tmp_dir = Path('tmp')
