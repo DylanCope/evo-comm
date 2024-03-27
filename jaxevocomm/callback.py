@@ -6,11 +6,31 @@ class TrainerCallback:
     def on_train_begin(self, config):
         pass
 
-    def on_train_end(self):
+    def on_train_end(self, training_state):
         pass
 
     def on_iteration_end(self, metric):
         pass
+
+
+
+class ChainedCallback(TrainerCallback):
+
+    def __init__(self, *callbacks):
+        self.callbacks = callbacks
+
+    def on_train_begin(self, config):
+        for cb in self.callbacks:
+            cb.on_train_begin(config)
+
+    def on_train_end(self, training_state):
+        for cb in self.callbacks:
+            cb.on_train_end(training_state)
+
+    def on_iteration_end(self, metric):
+        for cb in self.callbacks:
+            cb.on_iteration_end(metric)
+
 
 
 def wandb_try_login():
@@ -35,7 +55,7 @@ class WandbCallback(TrainerCallback):
             mode=self.config["WANDB_MODE"],
         )
 
-    def on_train_end(self):
+    def on_train_end(self, _):
         wandb.finish()
 
     def on_iteration_end(self, metric):

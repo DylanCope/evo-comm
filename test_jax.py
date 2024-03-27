@@ -126,7 +126,9 @@ def make_train(config):
     env = LogWrapper(env)
 
     def linear_schedule(count):
-        frac = 1.0 - (count // (config["NUM_MINIBATCHES"] * config["UPDATE_EPOCHS"])) / config["NUM_UPDATES"]
+        frac = 1.0 - (
+            count // (config["NUM_MINIBATCHES"] * config["UPDATE_EPOCHS"])
+        ) / config["NUM_UPDATES"]
         return config["LR"] * frac
 
     def train(rng):
@@ -145,7 +147,10 @@ def make_train(config):
                 optax.adam(learning_rate=linear_schedule, eps=1e-5),
             )
         else:
-            tx = optax.chain(optax.clip_by_global_norm(config["MAX_GRAD_NORM"]), optax.adam(config["LR"], eps=1e-5))
+            tx = optax.chain(
+                optax.clip_by_global_norm(config["MAX_GRAD_NORM"]),
+                optax.adam(config["LR"], eps=1e-5)
+            )
         train_state = TrainState.create(
             apply_fn=network.apply,
             params=network_params,

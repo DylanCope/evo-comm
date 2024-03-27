@@ -3,16 +3,17 @@ Based on PureJaxRL Implementation of IPPO, with changes to give a centralised cr
 """
 
 import numpy as np
-from typing import List, NamedTuple, Dict
+from typing import Callable, List, NamedTuple, Dict
 from functools import partial
 
 import jax
 import jax.numpy as jnp
 import optax
 from flax.training.train_state import TrainState
+from flax import struct
 from jaxmarl.environments.multi_agent_env import MultiAgentEnv
 
-from jaxevocomm.callback import TrainerCallback
+from jaxevocomm.callback import ChainedCallback, TrainerCallback
 from jaxevocomm.models.scanned_rnn import ScannedRNN
 from jaxevocomm.models.actor_rnn import ActorRNN
 from jaxevocomm.models.critic_rnn import CriticRNN
@@ -45,16 +46,38 @@ def unbatchify(x: jnp.ndarray,
     return {a: x[i] for i, a in enumerate(agent_ids)}
 
 
-class MAPPOTrainer:
+# TODO: add this class to MAPPO training (currently uses tuple)
+class MAPPOTrainState(struct.PyTreeNode):
+    """
+    Class to hold the training state of the MAPPO algorithm.
+    """
+
+    step: int
+    actor_train_state: TrainState = struct.field(pytree_node=True)
+    critic_train_state: TrainState = struct.field(pytree_node=True)
+
+    env_state: struct.dataclass = struct.field(pytree_node=True)
+    last_obs: Dict[str, jnp.ndarray] = struct.field(pytree_node=True)
+    last_done: jnp.ndarray = struct.field(pytree_node=True)
+
+    actor_hstate: jnp.ndarray = struct.field(pytree_node=True)
+    critic_hstate: jnp.ndarray = struct.field(pytree_node=True)
+
+
+class MAPPO:
 
     def __init__(self,
                  env: MultiAgentEnv,
                  config: dict,
-                 callback: TrainerCallback = None):
+                 callback: TrainerCallback | List[TrainerCallback] = None):
         self.config = config
-        self.rng = jax.random.PRNGKey(config["SEED"])
-        self.callback = callback or TrainerCallback()
         self.env = env    
+        self.rng = jax.random.PRNGKey(config["SEED"])
+
+        if isinstance(callback, list):
+            self.callback = ChainedCallback(*callback)
+        else:
+            self.callback = callback or TrainerCallback()
 
         config["NUM_ACTORS"] = self.env.num_agents * config["NUM_ENVS"]
         config["NUM_UPDATES"] = (
@@ -147,7 +170,7 @@ class MAPPOTrainer:
         self._create_networks()
         self._create_optimisers()
 
-    def _collect_trajectories(self, runner_state, update_steps):
+    def _collect_trajectories(self, runner_state):
         def _env_step(runner_state, _):
             train_states, env_state, last_obs, last_done, hstates, rng = runner_state
 
@@ -209,12 +232,11 @@ class MAPPOTrainer:
             )
             return runner_state, transition
 
-        initial_hstates = runner_state[-2]
         runner_state, traj_batch = jax.lax.scan(
             _env_step, runner_state, None, self.config["NUM_STEPS"]
         )
 
-        return initial_hstates, runner_state, traj_batch
+        return runner_state, traj_batch
 
     def _compute_advantages(self, runner_state, traj_batch):
     
@@ -288,7 +310,8 @@ class MAPPOTrainer:
 
     def _critic_loss_fn(self, critic_params, init_hstate, traj_batch, targets):
         # RERUN NETWORK
-        _, value = self.critic_network.apply(critic_params, init_hstate.transpose(), (traj_batch.world_state,  traj_batch.done)) 
+        _, value = self.critic_network.apply(critic_params, init_hstate.transpose(),
+                                             (traj_batch.world_state,  traj_batch.done)) 
 
         # CALCULATE VALUE LOSS
         value_pred_clipped = traj_batch.value + (
@@ -387,8 +410,10 @@ class MAPPOTrainer:
         # COLLECT TRAJECTORIES
         runner_state, update_steps = update_runner_state
         
-        initial_hstates, runner_state, traj_batch = self._collect_trajectories(runner_state,
-                                                                               update_steps)
+        # store initial hidden states for use in backwards pass
+        initial_hstates = runner_state[-2]
+        # collect trajectories
+        runner_state, traj_batch = self._collect_trajectories(runner_state)
 
         train_states, env_state, last_obs, last_done, hstates, rng = runner_state
 
@@ -426,8 +451,8 @@ class MAPPOTrainer:
     def run(self):
         self.callback.on_train_begin(self.config)
         with jax.disable_jit(False):
-            self._train()
-        self.callback.on_train_end()
+            final_state = self._train()
+        self.callback.on_train_end(final_state)
 
     def _create_init_runner_state(self):
         reset_rng = self._next_rng(self.config["NUM_ENVS"])
@@ -454,4 +479,4 @@ class MAPPOTrainer:
             lambda s, _: self._training_iteration(s),
             (runner_state, 0), None, self.config["NUM_UPDATES"]
         )
-        return {"runner_state": runner_state}
+        return runner_state

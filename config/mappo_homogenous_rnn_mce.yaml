@@ -22,6 +22,7 @@ ENV_NAME: "MimicryCommEnvGridworld"
 GRID_SIZE: 10
 N_AGENTS: 2
 N_PREY: 1
+N_OVERLAPPING_SOUNDS: 0
 
 # WandB Params
 WANDB_MODE: "online"
