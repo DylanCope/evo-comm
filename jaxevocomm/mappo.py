@@ -3,7 +3,7 @@ Based on PureJaxRL Implementation of IPPO, with changes to give a centralised cr
 """
 
 import numpy as np
-from typing import Callable, List, NamedTuple, Dict
+from typing import Any, Callable, List, NamedTuple, Dict, Tuple
 from functools import partial
 
 import jax
@@ -11,6 +11,8 @@ import jax.numpy as jnp
 import optax
 from flax.training.train_state import TrainState
 from flax import struct
+from flax import core
+
 from jaxmarl.environments.multi_agent_env import MultiAgentEnv
 
 from jaxevocomm.callback import ChainedCallback, TrainerCallback
@@ -46,13 +48,12 @@ def unbatchify(x: jnp.ndarray,
     return {a: x[i] for i, a in enumerate(agent_ids)}
 
 
-# TODO: add this class to MAPPO training (currently uses tuple)
 class MAPPOTrainState(struct.PyTreeNode):
     """
     Class to hold the training state of the MAPPO algorithm.
     """
 
-    step: int
+    training_iteration: int
     actor_train_state: TrainState = struct.field(pytree_node=True)
     critic_train_state: TrainState = struct.field(pytree_node=True)
 
@@ -62,6 +63,45 @@ class MAPPOTrainState(struct.PyTreeNode):
 
     actor_hstate: jnp.ndarray = struct.field(pytree_node=True)
     critic_hstate: jnp.ndarray = struct.field(pytree_node=True)
+
+    rng: jnp.ndarray = struct.field(pytree_node=True)
+
+    @classmethod
+    def create(cls, actor_train_state, critic_train_state, env_state,
+               last_obs, last_done, actor_hstate, critic_hstate, rng):
+        return cls(
+            training_iteration=0,
+            actor_train_state=actor_train_state,
+            critic_train_state=critic_train_state,
+            env_state=env_state,
+            last_obs=last_obs,
+            last_done=last_done,
+            actor_hstate=actor_hstate,
+            critic_hstate=critic_hstate,
+            rng=rng,
+        )
+
+    def next_rng(self):
+        rng, _rng = jax.random.split(self.rng)
+        return _rng, self.replace(rng=rng)
+
+
+class RolloutState(struct.PyTreeNode):
+    """
+    Class to hold the rollout state of the MAPPO algorithm.
+    """
+
+    actor_params: core.FrozenDict[str, Any] = struct.field(pytree_node=True)
+    critic_params: core.FrozenDict[str, Any] = struct.field(pytree_node=True)
+
+    env_state: struct.dataclass = struct.field(pytree_node=True)
+    last_obs: Dict[str, jnp.ndarray] = struct.field(pytree_node=True)
+    last_done: jnp.ndarray = struct.field(pytree_node=True)
+
+    actor_hstate: jnp.ndarray = struct.field(pytree_node=True)
+    critic_hstate: jnp.ndarray = struct.field(pytree_node=True)
+
+    rng: jnp.ndarray = struct.field(pytree_node=True)
 
 
 class MAPPO:
@@ -105,6 +145,8 @@ class MAPPO:
         self.actor_network = ActorRNN(self.action_space_dim,
                                       config=self.config)
         self.critic_network = CriticRNN()
+
+    def _create_init_network_states(self):
         _rng_actor, _rng_critic = self._next_rng(2)
         ac_init_x = (
             jnp.zeros((1, self.config["NUM_ENVS"],
@@ -113,18 +155,20 @@ class MAPPO:
             jnp.zeros((1, self.config["NUM_ENVS"])),
         )
         ac_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ENVS"], 128)
-        self.actor_network_params = self.actor_network.init(_rng_actor,
-                                                            ac_init_hstate,
-                                                            ac_init_x)
+        actor_network_params = self.actor_network.init(_rng_actor,
+                                                       ac_init_hstate,
+                                                       ac_init_x)
 
         cr_init_x = (
             jnp.zeros((1, self.config["NUM_ENVS"], self.env.world_state_size(),)),  #  + env.observation_space(env.agents[0]).shape[0]
             jnp.zeros((1, self.config["NUM_ENVS"])),
         )
         cr_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ENVS"], 128)
-        self.critic_network_params = self.critic_network.init(_rng_critic,
-                                                              cr_init_hstate,
-                                                              cr_init_x)
+        critic_network_params = self.critic_network.init(_rng_critic,
+                                                         cr_init_hstate,
+                                                         cr_init_x)
+
+        return actor_network_params, critic_network_params
 
     def _create_optimisers(self):
         if self.config["ANNEAL_LR"]:
@@ -155,99 +199,155 @@ class MAPPO:
                 optax.adam(self.config["LR"], eps=1e-5),
             )
 
-        self.actor_train_state = TrainState.create(
+        actor_network_params, critic_network_params = self._create_init_network_states()
+
+        actor_train_state = TrainState.create(
             apply_fn=self.actor_network.apply,
-            params=self.actor_network_params,
+            params=actor_network_params,
             tx=actor_tx,
         )
-        self.critic_train_state = TrainState.create(
+        critic_train_state = TrainState.create(
             apply_fn=self.actor_network.apply,
-            params=self.critic_network_params,
+            params=critic_network_params,
             tx=critic_tx,
         )
+
+        return actor_train_state, critic_train_state
 
     def setup(self):
         self._create_networks()
         self._create_optimisers()
 
-    def _collect_trajectories(self, runner_state):
-        def _env_step(runner_state, _):
-            train_states, env_state, last_obs, last_done, hstates, rng = runner_state
+    def run(self):
+        self.callback.on_train_begin(self.config)
+        with jax.disable_jit(False):
+            final_state = self._train()
+        self.callback.on_train_end(final_state)
+
+    def _create_init_runner_state(self):
+        ac_train_state, cr_train_state = self._create_optimisers()
+
+        reset_rng = self._next_rng(self.config["NUM_ENVS"])
+        init_obs, env_state = jax.vmap(self.env.reset, in_axes=(0,))(reset_rng)
+        ac_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ACTORS"], 128)
+        cr_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ACTORS"], 128)
+
+        runner_state = MAPPOTrainState.create(
+            actor_train_state=ac_train_state,
+            critic_train_state=cr_train_state,
+            env_state=env_state,
+            last_obs=init_obs,
+            last_done=jnp.zeros((self.config["NUM_ACTORS"]), dtype=bool),
+            actor_hstate=ac_init_hstate,
+            critic_hstate=cr_init_hstate,
+            rng=self._next_rng(), 
+        )
+
+        return runner_state
+
+    @partial(jax.jit, static_argnums=0)
+    def _train(self):
+        self.setup()
+        runner_state = self._create_init_runner_state()
+        runner_state, metric = jax.lax.scan(
+            lambda s, _: self._training_iteration(s),
+            runner_state, None, self.config["NUM_UPDATES"]
+        )
+        return runner_state
+
+    def _collect_trajectories(self,
+                              n_envs: int,
+                              n_steps: int,
+                              rollout_state: RolloutState) -> Tuple[RolloutState, Transition]:
+
+        n_actors = len(self.env.agents) * n_envs
+
+        def _env_step(rollout_state: RolloutState, _) -> Tuple[RolloutState, Transition]:
 
             # SELECT ACTION
-            rng, _rng = jax.random.split(rng)
+            rng, _rng = jax.random.split(rollout_state.rng)
 
-            obs_batch = batchify(last_obs, self.env.agents, self.config["NUM_ACTORS"])
+            obs_batch = batchify(
+                rollout_state.last_obs,
+                self.env.agents, n_actors
+            )
             ac_in = (
                 obs_batch[np.newaxis, :],
-                last_done[np.newaxis, :],
+                rollout_state.last_done[np.newaxis, :],
             )
 
-            ac_train_state, cr_train_state, *_ = train_states
-            ac_hstate, cr_hstate = hstates
-
-            ac_hstate, pi = self.actor_network.apply(ac_train_state.params,
-                                                     ac_hstate,
+            ac_hstate, pi = self.actor_network.apply(rollout_state.actor_params,
+                                                     rollout_state.actor_hstate,
                                                      ac_in)
             action = pi.sample(seed=_rng)
             log_prob = pi.log_prob(action)
             env_act = unbatchify(
-                action, self.env.agents, self.config["NUM_ENVS"], self.env.num_agents
+                action, self.env.agents,
+                n_envs, self.env.num_agents
             )
 
             # VALUE
-            world_state = last_obs["world_state"].reshape((self.config["NUM_ACTORS"],-1))
+            world_state = rollout_state.last_obs["world_state"].reshape((n_actors, -1))
             cr_in = (
                 world_state[None, :],
-                last_done[np.newaxis, :],
+                rollout_state.last_done[np.newaxis, :],
             )
-            cr_hstate, value = self.critic_network.apply(cr_train_state.params,
-                                                         cr_hstate,
+            cr_hstate, value = self.critic_network.apply(rollout_state.critic_params,
+                                                         rollout_state.critic_hstate,
                                                          cr_in)
 
             # STEP ENV
             rng, _rng = jax.random.split(rng)
-            rng_step = jax.random.split(_rng, self.config["NUM_ENVS"])
+            rng_step = jax.random.split(_rng, n_envs)
 
             obsv, env_state, reward, done, info = jax.vmap(
                 self.env.step, in_axes=(0, 0, 0)
-            )(rng_step, env_state, env_act)
+            )(rng_step, rollout_state.env_state, env_act)
 
-            info = jax.tree_map(lambda x: x.reshape((self.config["NUM_ACTORS"])), info)
-            done_batch = batchify(done, self.env.agents, self.config["NUM_ACTORS"]).squeeze()
+            info = jax.tree_map(lambda x: x.reshape((n_actors)), info)
+            done_batch = batchify(done, self.env.agents, n_actors).squeeze()
             transition = Transition(
                 jnp.tile(done["__all__"], self.env.num_agents),
                 done_batch,
                 action.squeeze(),
                 value.squeeze(),
-                batchify(reward, self.env.agents, self.config["NUM_ACTORS"]).squeeze(),
+                batchify(reward, self.env.agents, n_actors).squeeze(),
                 log_prob.squeeze(),
                 obs_batch,
                 world_state,
                 info,
             )
-            runner_state = (
-                train_states, env_state, obsv,
-                done_batch, (ac_hstate, cr_hstate), rng
-            )
-            return runner_state, transition
 
-        runner_state, traj_batch = jax.lax.scan(
-            _env_step, runner_state, None, self.config["NUM_STEPS"]
+            rollout_state = rollout_state.replace(
+                env_state=env_state,
+                last_obs=obsv,
+                last_done=done_batch,
+                actor_hstate=ac_hstate,
+                critic_hstate=cr_hstate,
+                rng=rng,
+            )
+            return rollout_state, transition
+
+        rollout_state, traj_batch = jax.lax.scan(
+            _env_step, rollout_state, None, n_steps
         )
 
-        return runner_state, traj_batch
+        return rollout_state, traj_batch
 
-    def _compute_advantages(self, runner_state, traj_batch):
-    
-        train_states, env_state, last_obs, last_done, hstates, rng = runner_state
-    
-        last_world_state = last_obs["world_state"].reshape((self.config["NUM_ACTORS"],-1))
+    def _compute_advantages(self,
+                            runner_state: MAPPOTrainState,
+                            traj_batch):
+
+        last_world_state = (
+            runner_state.last_obs["world_state"].reshape((self.config["NUM_ACTORS"], -1))
+        )
         cr_in = (
             last_world_state[None, :],
-            last_done[np.newaxis, :],
+            runner_state.last_done[np.newaxis, :],
         )
-        _, last_val = self.critic_network.apply(train_states[1].params, hstates[1], cr_in)
+        _, last_val = self.critic_network.apply(runner_state.critic_train_state.params,
+                                                runner_state.critic_hstate,
+                                                cr_in)
         last_val = last_val.squeeze()
 
         def _calculate_gae(traj_batch, last_val):
@@ -283,7 +383,7 @@ class MAPPO:
         _, pi = self.actor_network.apply(
             actor_params,
             init_hstate.transpose(),
-            (traj_batch.obs, traj_batch.done),
+            (jax.lax.stop_gradient(traj_batch.obs), traj_batch.done),
         )
         log_prob = pi.log_prob(traj_batch.action)
 
@@ -351,15 +451,16 @@ class MAPPO:
         
         return (actor_train_state, critic_train_state), loss_info
 
-    def _learn(self, update_state):
-        (
-            train_states,
-            init_hstates,
-            traj_batch,
-            advantages,
-            targets,
-            rng,
-        ) = update_state
+    def _learn(self,
+               init_rollout_state: RolloutState,
+               advantages,
+               targets,
+               traj_batch: Transition,
+               runner_state: MAPPOTrainState):
+
+        ac_init_hstate = init_rollout_state.actor_hstate[None, :].squeeze().transpose()
+        cr_init_hstate = init_rollout_state.critic_hstate[None, :].squeeze().transpose()
+        init_hstates = (ac_init_hstate, cr_init_hstate)
 
         init_hstates = jax.tree_map(lambda x: jnp.reshape(
             x, (self.config["NUM_STEPS"], self.config["NUM_ACTORS"])
@@ -372,8 +473,9 @@ class MAPPO:
             advantages.squeeze(),
             targets.squeeze(),
         )
-        permutation = jax.random.permutation(self._next_rng(),
-                                                self.config["NUM_ACTORS"])
+        rng, runner_state = runner_state.next_rng()
+        permutation = jax.random.permutation(rng, self.config["NUM_ACTORS"])
+
 
         shuffled_batch = jax.tree_util.tree_map(
             lambda x: jnp.take(x, permutation, axis=1), batch
@@ -392,91 +494,64 @@ class MAPPO:
             shuffled_batch,
         )
 
-        train_states, loss_info = jax.lax.scan(
+        train_states = (runner_state.actor_train_state,
+                        runner_state.critic_train_state)
+        (new_actor_train_state, new_critic_train_state), loss_info = jax.lax.scan(
             self._learn_step, train_states, minibatches
         )
 
-        update_state = (
-            train_states,
-            init_hstates,
-            traj_batch,
-            advantages,
-            targets,
-            rng,
+        runner_state = runner_state.replace(
+            actor_train_state=new_actor_train_state,
+            critic_train_state=new_critic_train_state,
         )
-        return update_state, loss_info
 
-    def _training_iteration(self, update_runner_state):
+        return runner_state, loss_info
+
+    def _training_iteration(self, runner_state: MAPPOTrainState):
         # COLLECT TRAJECTORIES
-        runner_state, update_steps = update_runner_state
-        
-        # store initial hidden states for use in backwards pass
-        initial_hstates = runner_state[-2]
-        # collect trajectories
-        runner_state, traj_batch = self._collect_trajectories(runner_state)
 
-        train_states, env_state, last_obs, last_done, hstates, rng = runner_state
+        # collect trajectories
+        init_rollout_state = RolloutState(
+            actor_params=runner_state.actor_train_state.params,
+            critic_params=runner_state.critic_train_state.params,
+            env_state=runner_state.env_state,
+            last_obs=runner_state.last_obs,
+            last_done=runner_state.last_done,
+            actor_hstate=runner_state.actor_hstate,
+            critic_hstate=runner_state.critic_hstate,
+            rng=runner_state.rng,
+        )
+        rollout_state, traj_batch = self._collect_trajectories(
+            self.config["NUM_ENVS"], self.config["NUM_STEPS"], init_rollout_state
+        )
+        runner_state = runner_state.replace(
+            env_state=rollout_state.env_state,
+            last_obs=rollout_state.last_obs,
+            last_done=rollout_state.last_done,
+            actor_hstate=rollout_state.actor_hstate,
+            critic_hstate=rollout_state.critic_hstate,
+            rng=rollout_state.rng,
+        )
 
         # CALCULATE ADVANTAGE
         advantages, targets = self._compute_advantages(runner_state, traj_batch)
 
-        # UPDATE NETWORK
-        ac_init_hstate = initial_hstates[0][None, :].squeeze().transpose()
-        cr_init_hstate = initial_hstates[1][None, :].squeeze().transpose()
-
-        update_state = (
-            train_states,
-            (ac_init_hstate, cr_init_hstate),
-            traj_batch,
-            advantages,
-            targets,
-            rng,
-        )
-        update_state, loss_info = jax.lax.scan(
-            lambda state, _: self._learn(state),
-            update_state, None, self.config["UPDATE_EPOCHS"]
+        runner_state, loss_info = jax.lax.scan(
+            lambda state, _: self._learn(init_rollout_state,
+                                         advantages,
+                                         targets,
+                                         traj_batch,
+                                         state),
+            runner_state, None, self.config["UPDATE_EPOCHS"]
         )
         loss_info = jax.tree_map(lambda x: x.mean(), loss_info)
-        
-        train_states = update_state[0]
+
         metric = traj_batch.info
-        rng = update_state[-1]
-        metric["update_steps"] = update_steps
+        training_iteration = runner_state.training_iteration + 1
+        metric["training_iteration"] = training_iteration
         jax.experimental.io_callback(self.callback.on_iteration_end,
                                      None, metric)
-        update_steps = update_steps + 1
-        runner_state = (train_states, env_state, last_obs, last_done, hstates, rng)
-        return (runner_state, update_steps), metric
 
-    def run(self):
-        self.callback.on_train_begin(self.config)
-        with jax.disable_jit(False):
-            final_state = self._train()
-        self.callback.on_train_end(final_state)
+        runner_state = runner_state.replace(training_iteration=training_iteration)
 
-    def _create_init_runner_state(self):
-        reset_rng = self._next_rng(self.config["NUM_ENVS"])
-        obsv, env_state = jax.vmap(self.env.reset, in_axes=(0,))(reset_rng)
-        ac_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ACTORS"], 128)
-        cr_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ACTORS"], 128)
-
-        runner_state = (
-            (self.actor_train_state, self.critic_train_state),
-            env_state,
-            obsv,
-            jnp.zeros((self.config["NUM_ACTORS"]), dtype=bool),
-            (ac_init_hstate, cr_init_hstate),
-            self._next_rng(),
-        )
-
-        return runner_state
-
-    @partial(jax.jit, static_argnums=0)
-    def _train(self):
-        self.setup()
-        runner_state = self._create_init_runner_state()
-        runner_state, metric = jax.lax.scan(
-            lambda s, _: self._training_iteration(s),
-            (runner_state, 0), None, self.config["NUM_UPDATES"]
-        )
-        return runner_state
+        return runner_state, metric

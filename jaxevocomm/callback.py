@@ -62,7 +62,7 @@ class WandbCallback(TrainerCallback):
         wandb.log(
             {
                 "returns": metric["returned_episode_returns"][-1, :].mean(),
-                "env_step": metric["update_steps"]
+                "env_steps": metric["training_iteration"]
                 * self.config["NUM_ENVS"]
                 * self.config["NUM_STEPS"],
             }
