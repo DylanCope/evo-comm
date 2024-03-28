@@ -1,24 +1,23 @@
 """
 Based on PureJaxRL Implementation of IPPO, with changes to give a centralised critic.
+
+Adapted from https://github.com/FLAIROx/JaxMARL/blob/main/baselines/MAPPO/mappo_rnn_mpe.py
 """
 
 import numpy as np
-from typing import Any, Callable, List, NamedTuple, Dict, Tuple
+from typing import Any, List, NamedTuple, Dict, Tuple
 from functools import partial
 
 import jax
 import jax.numpy as jnp
 import optax
 from flax.training.train_state import TrainState
-from flax import struct
-from flax import core
+from flax import struct, core
 
 from jaxmarl.environments.multi_agent_env import MultiAgentEnv
 
-from jaxevocomm.callback import ChainedCallback, TrainerCallback
-from jaxevocomm.models.scanned_rnn import ScannedRNN
-from jaxevocomm.models.actor_rnn import ActorRNN
-from jaxevocomm.models.critic_rnn import CriticRNN
+from jaxevocomm.train.callback import ChainedCallback, TrainerCallback
+from jaxevocomm.models import ScannedRNN, ActorRNN, CriticRNN
 
 
 class Transition(NamedTuple):
@@ -28,7 +27,7 @@ class Transition(NamedTuple):
     value: jnp.ndarray
     reward: jnp.ndarray
     log_prob: jnp.ndarray
-    obs: jnp.ndarray
+    obs: core.FrozenDict[str, jnp.ndarray]
     world_state: jnp.ndarray
     info: jnp.ndarray
 
@@ -58,7 +57,7 @@ class MAPPOTrainState(struct.PyTreeNode):
     critic_train_state: TrainState = struct.field(pytree_node=True)
 
     env_state: struct.dataclass = struct.field(pytree_node=True)
-    last_obs: Dict[str, jnp.ndarray] = struct.field(pytree_node=True)
+    last_obs: core.FrozenDict[str, jnp.ndarray] = struct.field(pytree_node=True)
     last_done: jnp.ndarray = struct.field(pytree_node=True)
 
     actor_hstate: jnp.ndarray = struct.field(pytree_node=True)
@@ -150,7 +149,6 @@ class MAPPO:
         _rng_actor, _rng_critic = self._next_rng(2)
         ac_init_x = (
             jnp.zeros((1, self.config["NUM_ENVS"],
-                    #    self.env.observation_space(self.env.agents[0]).shape[0])),
                        self.env.get_agent_obs_dim())),
             jnp.zeros((1, self.config["NUM_ENVS"])),
         )
@@ -160,7 +158,7 @@ class MAPPO:
                                                        ac_init_x)
 
         cr_init_x = (
-            jnp.zeros((1, self.config["NUM_ENVS"], self.env.world_state_size(),)),  #  + env.observation_space(env.agents[0]).shape[0]
+            jnp.zeros((1, self.config["NUM_ENVS"], self.env.world_state_size(),)),
             jnp.zeros((1, self.config["NUM_ENVS"])),
         )
         cr_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ENVS"], 128)
@@ -174,30 +172,27 @@ class MAPPO:
         if self.config["ANNEAL_LR"]:
 
             def linear_schedule(count):
+                total_steps = (
+                    self.config["NUM_MINIBATCHES"]
+                    * self.config["UPDATE_EPOCHS"]
+                )
                 frac = (
-                    1.0
-                    - (count // (self.config["NUM_MINIBATCHES"] * self.config["UPDATE_EPOCHS"]))
-                    / self.config["NUM_UPDATES"]
+                    1.0 - (count // total_steps) / self.config["NUM_UPDATES"]
                 )
                 return self.config["LR"] * frac
 
-            actor_tx = optax.chain(
-                optax.clip_by_global_norm(self.config["MAX_GRAD_NORM"]),
-                optax.adam(learning_rate=linear_schedule, eps=1e-5),
-            )
-            critic_tx = optax.chain(
-                optax.clip_by_global_norm(self.config["MAX_GRAD_NORM"]),
-                optax.adam(learning_rate=linear_schedule, eps=1e-5),
-            )
+            lr = linear_schedule
         else:
-            actor_tx = optax.chain(
-                optax.clip_by_global_norm(self.config["MAX_GRAD_NORM"]),
-                optax.adam(self.config["LR"], eps=1e-5),
-            )
-            critic_tx = optax.chain(
-                optax.clip_by_global_norm(self.config["MAX_GRAD_NORM"]),
-                optax.adam(self.config["LR"], eps=1e-5),
-            )
+            lr = self.config["LR"]
+
+        actor_tx = optax.chain(
+            optax.clip_by_global_norm(self.config["MAX_GRAD_NORM"]),
+            optax.adam(lr, eps=1e-5),
+        )
+        critic_tx = optax.chain(
+            optax.clip_by_global_norm(self.config["MAX_GRAD_NORM"]),
+            optax.adam(lr, eps=1e-5),
+        )
 
         actor_network_params, critic_network_params = self._create_init_network_states()
 
@@ -224,11 +219,17 @@ class MAPPO:
             final_state = self._train()
         self.callback.on_train_end(final_state)
 
+    def _init_env(self, n_envs: int) -> Tuple[core.FrozenDict[str, Any],
+                                              struct.dataclass]:
+        reset_rng = self._next_rng(n_envs)
+        init_obs, env_state = jax.vmap(self.env.reset, in_axes=(0,))(reset_rng)
+        return init_obs, env_state
+
     def _create_init_runner_state(self):
         ac_train_state, cr_train_state = self._create_optimisers()
 
-        reset_rng = self._next_rng(self.config["NUM_ENVS"])
-        init_obs, env_state = jax.vmap(self.env.reset, in_axes=(0,))(reset_rng)
+        init_obs, env_state = self._init_env(self.config["NUM_ENVS"])
+
         ac_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ACTORS"], 128)
         cr_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ACTORS"], 128)
 
@@ -448,7 +449,7 @@ class MAPPO:
             "critic_loss": critic_loss[0],
             "entropy": actor_loss[1][1],
         }
-        
+
         return (actor_train_state, critic_train_state), loss_info
 
     def _learn(self,
@@ -509,8 +510,6 @@ class MAPPO:
 
     def _training_iteration(self, runner_state: MAPPOTrainState):
         # COLLECT TRAJECTORIES
-
-        # collect trajectories
         init_rollout_state = RolloutState(
             actor_params=runner_state.actor_train_state.params,
             critic_params=runner_state.critic_train_state.params,
@@ -549,9 +548,9 @@ class MAPPO:
         metric = traj_batch.info
         training_iteration = runner_state.training_iteration + 1
         metric["training_iteration"] = training_iteration
-        jax.experimental.io_callback(self.callback.on_iteration_end,
-                                     None, metric)
-
         runner_state = runner_state.replace(training_iteration=training_iteration)
+
+        jax.experimental.io_callback(self.callback.on_iteration_end,
+                                     None, training_iteration, runner_state, metric)
 
         return runner_state, metric

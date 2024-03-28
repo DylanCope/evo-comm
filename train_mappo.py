@@ -1,14 +1,16 @@
 import json
-
 import hydra
 from omegaconf import OmegaConf
-from jaxevocomm.env.mimicry_comm_env import MimicryCommEnvGridworld
-import jaxmarl
 
-from jaxevocomm.callback import WandbCallback
-from jaxevocomm.mappo import MAPPO
-from jaxevocomm.mappo_state_wrapper import MAPPOWorldStateWrapper
+from jaxevocomm.train.callback.callback import ChainedCallback
+from jaxevocomm.train.callback.ckpt_cb import Checkpointer
+from jaxevocomm.utils.hydra_utils import get_current_hydra_output_dir
+import jaxmarl
 from jaxmarl.wrappers.baselines import MPELogWrapper
+
+from jaxevocomm.env.mimicry_comm_env import MimicryCommEnvGridworld
+from jaxevocomm.train.callback import WandbCallback
+from jaxevocomm.train.mappo import MAPPO, MAPPOWorldStateWrapper
 
 
 def make_env(config: dict):
@@ -38,8 +40,19 @@ def make_env(config: dict):
 def main(config):
     config = OmegaConf.to_container(config)
     print('Config:\n', json.dumps(config, indent=4))
+
     env = make_env(config)
-    cb = WandbCallback()
+
+    output_dir = get_current_hydra_output_dir()
+    cb = ChainedCallback(
+        WandbCallback(),
+        Checkpointer(
+            output_dir / 'checkpoints',
+            max_to_keep=config.get('KEEP_CHECKPOINTS', 1),
+            save_interval_steps=config.get('CHECKPOINT_INTERVAL', 20)
+        )
+    )
+
     trainer = MAPPO(env, config, cb)
     trainer.run()
 
