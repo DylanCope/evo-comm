@@ -6,7 +6,7 @@ class TrainerCallback:
     def on_train_end(self, training_state):
         pass
 
-    def on_iteration_end(self, iteration, training_state, metric):
+    def on_iteration_end(self, iteration, training_state, metrics):
         pass
 
 
@@ -24,6 +24,6 @@ class ChainedCallback(TrainerCallback):
         for cb in self.callbacks:
             cb.on_train_end(training_state)
 
-    def on_iteration_end(self, iteration, training_state, metric):
+    def on_iteration_end(self, iteration, training_state, metrics):
         for cb in self.callbacks:
-            cb.on_iteration_end(iteration, training_state, metric)
+            cb.on_iteration_end(iteration, training_state, metrics)

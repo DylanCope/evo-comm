@@ -1,3 +1,4 @@
+from typing import List
 import wandb
 
 from .callback import TrainerCallback
@@ -13,7 +14,15 @@ def wandb_try_login():
 
 class WandbCallback(TrainerCallback):
 
-    def on_train_begin(self, config):
+    def __init__(self,
+                 log_metrics: List[str] = None,
+                 tags: List[str] = None):
+        self.log_metrics = set(log_metrics or []) | {
+            'mean_total_reward', 'total_env_steps', 'training_iteration'
+        }
+        self.tags = tags
+
+    def on_train_begin(self, config: dict):
         self.config = config
 
         wandb_try_login()
@@ -21,7 +30,7 @@ class WandbCallback(TrainerCallback):
         wandb.init(
             entity=self.config["ENTITY"],
             project=self.config["PROJECT"],
-            tags=["MAPPO", "RNN", self.config["ENV_NAME"]],
+            tags=self.tags,
             config=self.config,
             mode=self.config["WANDB_MODE"],
         )
@@ -30,11 +39,6 @@ class WandbCallback(TrainerCallback):
         wandb.finish()
 
     def on_iteration_end(self, iteration, training_state, metric):
-        wandb.log(
-            {
-                "returns": metric["returned_episode_returns"][-1, :].mean(),
-                "env_steps": metric["training_iteration"]
-                * self.config["NUM_ENVS"]
-                * self.config["NUM_STEPS"],
-            }
-        )
+        wandb.log({
+            k: v for k, v in metric.items() if k in self.log_metrics
+        })

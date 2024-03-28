@@ -4,20 +4,22 @@ Based on PureJaxRL Implementation of IPPO, with changes to give a centralised cr
 Adapted from https://github.com/FLAIROx/JaxMARL/blob/main/baselines/MAPPO/mappo_rnn_mpe.py
 """
 
+from pathlib import Path
 import numpy as np
 from typing import Any, List, NamedTuple, Dict, Tuple
 from functools import partial
 
 import jax
 import jax.numpy as jnp
+from omegaconf import OmegaConf
 import optax
 from flax.training.train_state import TrainState
 from flax import struct, core
 
-from jaxmarl.environments.multi_agent_env import MultiAgentEnv
-
+from jaxevocomm.env import make_env
 from jaxevocomm.train.callback import ChainedCallback, TrainerCallback
 from jaxevocomm.models import ScannedRNN, ActorRNN, CriticRNN
+from jaxevocomm.train.callback.ckpt_cb import load_best_ckpt
 
 
 class Transition(NamedTuple):
@@ -106,11 +108,10 @@ class RolloutState(struct.PyTreeNode):
 class MAPPO:
 
     def __init__(self,
-                 env: MultiAgentEnv,
                  config: dict,
                  callback: TrainerCallback | List[TrainerCallback] = None):
         self.config = config
-        self.env = env    
+        self.env = make_env(config)
         self.rng = jax.random.PRNGKey(config["SEED"])
 
         if isinstance(callback, list):
@@ -211,7 +212,7 @@ class MAPPO:
 
     def setup(self):
         self._create_networks()
-        self._create_optimisers()
+        return self._create_init_runner_state()
 
     def run(self):
         self.callback.on_train_begin(self.config)
@@ -248,9 +249,8 @@ class MAPPO:
 
     @partial(jax.jit, static_argnums=0)
     def _train(self):
-        self.setup()
-        runner_state = self._create_init_runner_state()
-        runner_state, metric = jax.lax.scan(
+        runner_state = self.setup()
+        runner_state, _ = jax.lax.scan(
             lambda s, _: self._training_iteration(s),
             runner_state, None, self.config["NUM_UPDATES"]
         )
@@ -334,6 +334,23 @@ class MAPPO:
         )
 
         return rollout_state, traj_batch
+
+    def rollout(self, runner_state: MAPPOTrainState, n_envs: int, n_steps: int) -> Transition:
+        init_obs, env_state = self._init_env(n_envs)
+        init_rollout_state = RolloutState(
+            actor_params=runner_state.actor_train_state.params,
+            critic_params=runner_state.critic_train_state.params,
+            env_state=env_state,
+            last_obs=init_obs,
+            last_done=jnp.zeros((n_envs * len(self.env.agents)), dtype=bool),
+            actor_hstate=runner_state.actor_hstate,
+            critic_hstate=runner_state.critic_hstate,
+            rng=runner_state.rng,
+        )
+        _, traj_batch = self._collect_trajectories(
+            n_envs, n_steps, init_rollout_state
+        )
+        return traj_batch, self._compute_metrics(traj_batch)
 
     def _compute_advantages(self,
                             runner_state: MAPPOTrainState,
@@ -508,6 +525,11 @@ class MAPPO:
 
         return runner_state, loss_info
 
+    def _compute_metrics(self, traj_batch: Transition) -> Dict[str, jnp.ndarray]:
+        metrics = traj_batch.info
+        metrics["mean_total_reward"] = metrics["returned_episode_returns"][-1, :].mean()
+        return metrics
+
     def _training_iteration(self, runner_state: MAPPOTrainState):
         # COLLECT TRAJECTORIES
         init_rollout_state = RolloutState(
@@ -545,12 +567,30 @@ class MAPPO:
         )
         loss_info = jax.tree_map(lambda x: x.mean(), loss_info)
 
-        metric = traj_batch.info
         training_iteration = runner_state.training_iteration + 1
-        metric["training_iteration"] = training_iteration
+
+        metrics = self._compute_metrics(traj_batch)
+        metrics["training_iteration"] = training_iteration
+        metrics["total_env_steps"] = (
+            training_iteration
+            * self.config["NUM_ENVS"]
+            * self.config["NUM_STEPS"]
+        )
         runner_state = runner_state.replace(training_iteration=training_iteration)
 
         jax.experimental.io_callback(self.callback.on_iteration_end,
-                                     None, training_iteration, runner_state, metric)
+                                     None, training_iteration, runner_state, metrics)
 
-        return runner_state, metric
+        return runner_state, metrics
+
+    def restore_best_training_state(self, experiment_dir: str | Path, **kwargs) -> MAPPOTrainState:
+        return load_best_ckpt(Path(experiment_dir) / 'checkpoints',
+                              self.setup(),
+                              **kwargs)
+
+    @classmethod
+    def restore(cls, experiment_dir: str | Path, **kwargs):
+        config = OmegaConf.load(Path(experiment_dir) / '.hydra/config.yaml')
+        trainer = cls(config)
+        runner_state = trainer.restore_best_training_state(experiment_dir, **kwargs)
+        return trainer, runner_state
