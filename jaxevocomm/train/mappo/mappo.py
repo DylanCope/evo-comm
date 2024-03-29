@@ -32,6 +32,7 @@ class Transition(NamedTuple):
     obs: core.FrozenDict[str, jnp.ndarray]
     world_state: jnp.ndarray
     info: jnp.ndarray
+    env_state: struct.dataclass
 
 
 def batchify(x: Dict[str, jnp.ndarray],
@@ -43,10 +44,47 @@ def batchify(x: Dict[str, jnp.ndarray],
 
 def unbatchify(x: jnp.ndarray,
                agent_ids: List[str],
-               num_envs: int,
-               num_actors: int) -> Dict[str, jnp.ndarray]:
-    x = x.reshape((num_actors, num_envs, -1))
+               num_envs: int) -> Dict[str, jnp.ndarray]:
+    num_agents = len(agent_ids)
+    x = x.reshape((num_agents, num_envs, -1))
     return {a: x[i] for i, a in enumerate(agent_ids)}
+
+
+def unbatchify_traj_batch(traj_batch: Transition,
+                          agent_ids: List[str]) -> Dict[str, Transition]:
+    n_agents = len(agent_ids)
+    n_steps, batch_size = traj_batch.done.shape
+    n_envs = batch_size // n_agents
+
+    def _unbatchify(x):
+        return x.reshape((n_steps, n_agents, n_envs, -1)).squeeze()
+
+    global_done = _unbatchify(traj_batch.global_done)
+    done = _unbatchify(traj_batch.done)
+    action = _unbatchify(traj_batch.action)
+    value = _unbatchify(traj_batch.value)
+    reward = _unbatchify(traj_batch.reward)
+    log_prob = _unbatchify(traj_batch.log_prob)
+    world_state = _unbatchify(traj_batch.world_state)
+    info = jax.tree_map(_unbatchify, traj_batch.info)
+
+    return {
+        a: Transition(
+            global_done=global_done[:, i],
+            done=done[:, i],
+            action=action[:, i],
+            value=value[:, i],
+            reward=reward[:, i],
+            log_prob=log_prob[:, i],
+            obs=traj_batch.obs[:, i],
+            world_state=world_state[:, i],
+            info={
+                k: v[:, i] for k, v in info.items()
+            },
+            env_state=traj_batch.env_state
+        )
+        for i, a in enumerate(agent_ids)
+    }    
 
 
 class MAPPOTrainState(struct.PyTreeNode):
@@ -283,8 +321,7 @@ class MAPPO:
             action = pi.sample(seed=_rng)
             log_prob = pi.log_prob(action)
             env_act = unbatchify(
-                action, self.env.agents,
-                n_envs, self.env.num_agents
+                action, self.env.agents, n_envs
             )
 
             # VALUE
@@ -317,6 +354,7 @@ class MAPPO:
                 obs_batch,
                 world_state,
                 info,
+                env_state,
             )
 
             rollout_state = rollout_state.replace(
@@ -327,6 +365,7 @@ class MAPPO:
                 critic_hstate=cr_hstate,
                 rng=rng,
             )
+
             return rollout_state, transition
 
         rollout_state, traj_batch = jax.lax.scan(
@@ -335,7 +374,7 @@ class MAPPO:
 
         return rollout_state, traj_batch
 
-    def rollout(self, runner_state: MAPPOTrainState, n_envs: int, n_steps: int) -> Transition:
+    def rollout(self, runner_state: MAPPOTrainState, n_envs: int, n_steps: int) -> Dict[str, Transition]:
         init_obs, env_state = self._init_env(n_envs)
         init_rollout_state = RolloutState(
             actor_params=runner_state.actor_train_state.params,
@@ -350,7 +389,8 @@ class MAPPO:
         _, traj_batch = self._collect_trajectories(
             n_envs, n_steps, init_rollout_state
         )
-        return traj_batch, self._compute_metrics(traj_batch)
+        trajectories = unbatchify_traj_batch(traj_batch, self.env.agents)
+        return trajectories, self._compute_metrics(trajectories)
 
     def _compute_advantages(self,
                             runner_state: MAPPOTrainState,
@@ -525,9 +565,18 @@ class MAPPO:
 
         return runner_state, loss_info
 
-    def _compute_metrics(self, traj_batch: Transition) -> Dict[str, jnp.ndarray]:
-        metrics = traj_batch.info
-        metrics["mean_total_reward"] = metrics["returned_episode_returns"][-1, :].mean()
+    def _compute_metrics(self, trajectories: Dict[str, Transition]) -> Dict[str, jnp.ndarray]:
+        metrics = {}
+        mean_agent_rewards = [
+            trajectories[a].reward.sum(-1) for a in trajectories
+        ]
+        metrics['mean_total_team_reward'] = jnp.mean(jnp.concatenate(mean_agent_rewards))
+        for agent, reward in zip(self.env.agents, mean_agent_rewards):
+            metrics[f'mean_{agent}_total_reward'] = reward
+        agent_0, *_ = trajectories.keys()
+        metrics['num_episodes'] = trajectories[agent_0].global_done.sum()
+        metrics['n_env_steps'] = np.prod(trajectories[agent_0].global_done.shape)
+        metrics['mean_episode_length'] = metrics['n_env_steps'] / metrics['num_episodes']
         return metrics
 
     def _training_iteration(self, runner_state: MAPPOTrainState):
