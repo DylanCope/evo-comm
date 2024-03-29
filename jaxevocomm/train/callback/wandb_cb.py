@@ -18,7 +18,8 @@ class WandbCallback(TrainerCallback):
                  log_metrics: List[str] = None,
                  tags: List[str] = None):
         self.log_metrics = set(log_metrics or []) | {
-            'mean_total_reward', 'total_env_steps', 'training_iteration'
+            'mean_total_reward', 'total_env_steps',
+            'training_iteration', 'mean_episode_length'
         }
         self.tags = tags
 

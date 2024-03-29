@@ -258,16 +258,19 @@ class MAPPO:
             final_state = self._train()
         self.callback.on_train_end(final_state)
 
-    def _init_env(self, n_envs: int) -> Tuple[core.FrozenDict[str, Any],
-                                              struct.dataclass]:
-        reset_rng = self._next_rng(n_envs)
+    def _init_env(self,
+                  n_envs: int,
+                  rng: jnp.ndarray) -> Tuple[core.FrozenDict[str, Any],
+                                             struct.dataclass]:
+        reset_rng = jax.random.split(rng, n_envs)
         init_obs, env_state = jax.vmap(self.env.reset, in_axes=(0,))(reset_rng)
         return init_obs, env_state
 
     def _create_init_runner_state(self):
         ac_train_state, cr_train_state = self._create_optimisers()
 
-        init_obs, env_state = self._init_env(self.config["NUM_ENVS"])
+        rng = self._next_rng()
+        init_obs, env_state = self._init_env(self.config["NUM_ENVS"], rng)
 
         ac_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ACTORS"], 128)
         cr_init_hstate = ScannedRNN.initialize_carry(self.config["NUM_ACTORS"], 128)
@@ -344,6 +347,7 @@ class MAPPO:
 
             info = jax.tree_map(lambda x: x.reshape((n_actors)), info)
             done_batch = batchify(done, self.env.agents, n_actors).squeeze()
+
             transition = Transition(
                 jnp.tile(done["__all__"], self.env.num_agents),
                 done_batch,
@@ -419,7 +423,8 @@ class MAPPO:
                 delta = reward + self.config["GAMMA"] * next_value * (1 - done) - value
                 gae = (
                     delta
-                    + self.config["GAMMA"] * self.config["GAE_LAMBDA"] * (1 - done) * gae
+                    + self.config["GAMMA"]
+                    * self.config["GAE_LAMBDA"] * (1 - done) * gae
                 )
                 return (gae, value), gae
 
@@ -565,28 +570,45 @@ class MAPPO:
 
         return runner_state, loss_info
 
-    def _compute_metrics(self, trajectories: Dict[str, Transition]) -> Dict[str, jnp.ndarray]:
+    def _compute_metrics(self,
+                         trajectories: Dict[str, Transition]) -> Dict[str, jnp.ndarray]:
         metrics = {}
-        mean_agent_rewards = [
-            trajectories[a].reward.sum(-1) for a in trajectories
-        ]
-        metrics['mean_total_team_reward'] = jnp.mean(jnp.concatenate(mean_agent_rewards))
-        for agent, reward in zip(self.env.agents, mean_agent_rewards):
-            metrics[f'mean_{agent}_total_reward'] = reward
-        agent_0, *_ = trajectories.keys()
+        agent_0, *_ = self.env.agents
         metrics['num_episodes'] = trajectories[agent_0].global_done.sum()
+
+        def _create_row_done_mask(dones):
+            return jax.lax.scan(
+                lambda found_done, is_done: (is_done | found_done, is_done | found_done),
+                False, dones, reverse=True
+            )[::-1]
+
+        dones_mask, _ = jax.vmap(
+            _create_row_done_mask, in_axes=(1,)
+        )(trajectories[agent_0].global_done)
+        dones_mask = dones_mask.transpose()
+
+        metrics['mean_total_reward'] = (
+            (dones_mask * trajectories[agent_0].reward).sum() / metrics['num_episodes']
+        )
         metrics['n_env_steps'] = np.prod(trajectories[agent_0].global_done.shape)
-        metrics['mean_episode_length'] = metrics['n_env_steps'] / metrics['num_episodes']
+        metrics['mean_episode_length'] = (
+            dones_mask.sum() / metrics['num_episodes']
+        )
         return metrics
 
     def _training_iteration(self, runner_state: MAPPOTrainState):
         # COLLECT TRAJECTORIES
+
+        reset_rng, runner_state = runner_state.next_rng()
+        init_obs, env_state = self._init_env(self.config["NUM_ENVS"],
+                                             reset_rng)
+
         init_rollout_state = RolloutState(
             actor_params=runner_state.actor_train_state.params,
             critic_params=runner_state.critic_train_state.params,
-            env_state=runner_state.env_state,
-            last_obs=runner_state.last_obs,
-            last_done=runner_state.last_done,
+            env_state=env_state,
+            last_obs=init_obs,
+            last_done=jnp.zeros((self.config["NUM_ACTORS"]), dtype=bool),
             actor_hstate=runner_state.actor_hstate,
             critic_hstate=runner_state.critic_hstate,
             rng=runner_state.rng,
@@ -618,7 +640,8 @@ class MAPPO:
 
         training_iteration = runner_state.training_iteration + 1
 
-        metrics = self._compute_metrics(traj_batch)
+        trajectories = unbatchify_traj_batch(traj_batch, self.env.agents)
+        metrics = self._compute_metrics(trajectories)
         metrics["training_iteration"] = training_iteration
         metrics["total_env_steps"] = (
             training_iteration
