@@ -378,8 +378,12 @@ class MAPPO:
 
         return rollout_state, traj_batch
 
-    def rollout(self, runner_state: MAPPOTrainState, n_envs: int, n_steps: int) -> Dict[str, Transition]:
-        init_obs, env_state = self._init_env(n_envs)
+    def rollout(self,
+                runner_state: MAPPOTrainState,
+                n_envs: int,
+                n_steps: int) -> Dict[str, Transition]:
+        rng, runner_state = runner_state.next_rng()
+        init_obs, env_state = self._init_env(n_envs, rng)
         init_rollout_state = RolloutState(
             actor_params=runner_state.actor_train_state.params,
             critic_params=runner_state.critic_train_state.params,

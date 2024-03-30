@@ -10,7 +10,7 @@ from jaxevocomm.train.callback import (
 
 
 @hydra.main(version_base=None,
-            config_path="config/mappo_homogenous_rnn",
+            config_path="config",
             config_name="mpe")
 def main(config):
     config = OmegaConf.to_container(config)

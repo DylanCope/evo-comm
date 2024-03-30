@@ -12,6 +12,8 @@ tmp
 sync
 .Trash*
 outputs
+wandb
+multirun
 wandb/*
 .wandb_api_key
 

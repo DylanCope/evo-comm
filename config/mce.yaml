@@ -1,3 +1,7 @@
+defaults:
+  - override hydra/launcher: slurm_launcher
+  - _self_
+
 LR: 2e-3
 NUM_ENVS: 128 
 NUM_STEPS: 128 # must be 128
@@ -22,6 +26,7 @@ ENV_NAME: "MimicryCommEnvGridworld"
 GRID_SIZE: 10
 N_AGENTS: 2
 N_PREY: 1
+N_TOTAL_SOUNDS: 20
 N_OVERLAPPING_SOUNDS: 0
 
 # WandB Params
