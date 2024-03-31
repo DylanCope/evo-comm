@@ -1,0 +1,1 @@
+python train.py -cn mce_evo --multirun SEED=1,2,3,4 N_TOTAL_SOUNDS=10 N_OVERLAPPING_SOUNDS=0,5,10

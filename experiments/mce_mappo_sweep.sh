@@ -1,0 +1,1 @@
+python train.py -cn mce_mappo --multirun TOTAL_TIMESTEPS=5000000 SEED=1,2,3,4 N_TOTAL_SOUNDS=10 N_OVERLAPPING_SOUNDS=0,5,10

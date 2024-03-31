@@ -2,6 +2,8 @@ defaults:
   - override hydra/launcher: slurm_launcher
   - _self_
 
+ALGORITHM: "MAPPO"
+
 LR: 2e-3
 NUM_ENVS: 128 
 NUM_STEPS: 128 # must be 128

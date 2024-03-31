@@ -2,7 +2,6 @@ import jaxmarl
 from jaxmarl.wrappers.baselines import MPELogWrapper
 
 from jaxevocomm.env.mimicry_comm_env import MimicryCommEnvGridworld
-from jaxevocomm.train.mappo import MAPPOWorldStateWrapper
 
 
 def make_env(config: dict):
@@ -10,12 +9,11 @@ def make_env(config: dict):
     if env_name.startswith("MPE_"):
         env = jaxmarl.make(config["ENV_NAME"],
                         **config["ENV_KWARGS"])
-        env = MAPPOWorldStateWrapper(env)
         env = MPELogWrapper(env)
         return env
 
     elif env_name == "MimicryCommEnvGridworld":
-        overlapping_sounds = config['N_OVERLAPPING_SOUNDS']
+        overlapping_sounds = config.get('N_OVERLAPPING_SOUNDS', 0)
         total_sounds = config['N_TOTAL_SOUNDS']
         agent_sounds = (total_sounds - overlapping_sounds) // 2
         prey_sounds = total_sounds - agent_sounds - overlapping_sounds
@@ -29,7 +27,6 @@ def make_env(config: dict):
                                       n_overlapping_sounds=overlapping_sounds,
                                       n_agent_only_sounds=agent_sounds,
                                       n_prey_only_sounds=prey_sounds,)
-        env = MAPPOWorldStateWrapper(env)
         env = MPELogWrapper(env)
         return env
 

@@ -4,6 +4,12 @@ Based on PureJaxRL Implementation of IPPO, with changes to give a centralised cr
 Adapted from https://github.com/FLAIROx/JaxMARL/blob/main/baselines/MAPPO/mappo_rnn_mpe.py
 """
 
+from .mappo_state_wrapper import MAPPOWorldStateWrapper
+from jaxevocomm.env import make_env
+from jaxevocomm.train.callback import ChainedCallback, TrainerCallback
+from jaxevocomm.models import ScannedRNN, ActorRNN, CriticRNN
+from jaxevocomm.train.mappo.ckpt_cb import load_best_ckpt
+
 from pathlib import Path
 import numpy as np
 from typing import Any, List, NamedTuple, Dict, Tuple
@@ -15,11 +21,6 @@ from omegaconf import OmegaConf
 import optax
 from flax.training.train_state import TrainState
 from flax import struct, core
-
-from jaxevocomm.env import make_env
-from jaxevocomm.train.callback import ChainedCallback, TrainerCallback
-from jaxevocomm.models import ScannedRNN, ActorRNN, CriticRNN
-from jaxevocomm.train.callback.ckpt_cb import load_best_ckpt
 
 
 class Transition(NamedTuple):
@@ -149,7 +150,7 @@ class MAPPO:
                  config: dict,
                  callback: TrainerCallback | List[TrainerCallback] = None):
         self.config = config
-        self.env = make_env(config)
+        self.env = MAPPOWorldStateWrapper(make_env(config))
         self.rng = jax.random.PRNGKey(config["SEED"])
 
         if isinstance(callback, list):

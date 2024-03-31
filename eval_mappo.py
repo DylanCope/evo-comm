@@ -2,7 +2,7 @@ from jaxevocomm.train.mappo import MAPPO
 import jax
 
 
-experiment_dir = 'outputs/2024-03-29/08-30-57'
+experiment_dir = 'multirun/2024-03-30/15-34-43/0'
 trainer, runner_state = MAPPO.restore(experiment_dir)
 print('Successfully restored trainer and runner_state')
 

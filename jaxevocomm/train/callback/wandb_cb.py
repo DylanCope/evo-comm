@@ -14,13 +14,7 @@ def wandb_try_login():
 
 class WandbCallback(TrainerCallback):
 
-    def __init__(self,
-                 log_metrics: List[str] = None,
-                 tags: List[str] = None):
-        self.log_metrics = set(log_metrics or []) | {
-            'mean_total_reward', 'total_env_steps',
-            'training_iteration', 'mean_episode_length'
-        }
+    def __init__(self, tags: List[str] = None):
         self.tags = tags
 
     def on_train_begin(self, config: dict):
@@ -39,7 +33,5 @@ class WandbCallback(TrainerCallback):
     def on_train_end(self, training_state):
         wandb.finish()
 
-    def on_iteration_end(self, iteration, training_state, metric):
-        wandb.log({
-            k: v for k, v in metric.items() if k in self.log_metrics
-        })
+    def on_iteration_end(self, iteration, training_state, metrics):
+        wandb.log(metrics)

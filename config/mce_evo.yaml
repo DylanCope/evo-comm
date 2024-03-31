@@ -1,0 +1,29 @@
+defaults:
+  - override hydra/launcher: slurm_launcher
+  - _self_
+
+ALGORITHM: "EVO"
+
+NUM_ENVS: 16 
+NUM_STEPS: 128 # must be 128
+TOTAL_GENERATIONS: 10000
+POP_SIZE: 128
+STRATEGY: "DE" # Differential Evolution (DE)
+
+SEED: 1
+
+ENV_NAME: "MimicryCommEnvGridworld"
+GRID_SIZE: 10
+N_AGENTS: 2
+N_PREY: 1
+N_TOTAL_SOUNDS: 5
+N_OVERLAPPING_SOUNDS: 2
+
+# WandB Params
+WANDB_MODE: "online"
+ENTITY: "drcope"
+PROJECT: "jaxmarl-mce"
+
+# Checkpointing
+CHECKPOINT_INTERVAL: 20
+KEEP_CHECKPOINTS: 3

@@ -1,4 +1,4 @@
-from .callback import TrainerCallback
+from ..callback.callback import TrainerCallback
 
 from pathlib import Path
 from typing import Any, List
@@ -38,7 +38,7 @@ def load_best_ckpt(ckpts_dir: Path,
                                       args=ocp.args.StandardRestore(abstract_pytree))
 
 
-class Checkpointer(TrainerCallback):
+class MAPPOCheckpointer(TrainerCallback):
 
     def __init__(self,
                  ckpts_dir : str | Path,
