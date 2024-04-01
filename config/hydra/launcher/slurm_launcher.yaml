@@ -2,4 +2,5 @@ defaults:
   - submitit_slurm
 
 _target_: hydra_plugins.hydra_submitit_launcher.submitit_launcher.SlurmLauncher
-gpus_per_task: 1
+gpus_per_task: 4
+qos: high

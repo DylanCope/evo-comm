@@ -8,7 +8,7 @@ import jax
 import jax.numpy as jnp
 from flax import struct
 from evosax.strategy import EvoState
-from evosax import DE, FitnessShaper
+from evosax import DE, FitnessShaper, Strategies
 
 
 
@@ -48,9 +48,11 @@ class EvoRunner:
         self.fit_shaper = FitnessShaper(maximize=True)
         self.callback = callback
 
-        if config.get('EVO_STRATEGY', 'DE') == 'DE':
-            self.strategy = DE(popsize=self.config['POP_SIZE'],
-                               num_dims=self.fitness_evaluator.n_params)
+        strategy_name = config.get('EVO_STRATEGY', 'SimpleGA')
+        if strategy_name in Strategies:
+            strategy_cls = Strategies[strategy_name]
+            self.strategy = strategy_cls(popsize=self.config['POP_SIZE'],
+                                         num_dims=self.fitness_evaluator.n_params)
         else:
             raise ValueError(f"Unknown EVO strategy {config['EVO_STRATEGY']}")
 
