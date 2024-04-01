@@ -13,7 +13,7 @@ from jaxevocomm.train.callback import (
 
 def create_mappo_trainer(config: dict):
 
-    output_dir = get_current_hydra_output_dir()
+    output_dir = config['OUTPUT_DIR']
     cb = ChainedCallback(
         WandbCallback(tags=[config['ALGORITHM'], "RNN", config["ENV_NAME"]]),
         MAPPOCheckpointer(
@@ -28,7 +28,7 @@ def create_mappo_trainer(config: dict):
 
 
 def create_evo_runner(config: dict):
-    output_dir = get_current_hydra_output_dir()
+    output_dir = config['OUTPUT_DIR']
     cb = ChainedCallback(
         WandbCallback(tags=[config['ALGORITHM'], "RNN", config["ENV_NAME"]]),
         MetricsLogger(output_dir)
@@ -43,6 +43,8 @@ def create_evo_runner(config: dict):
 def main(config):
     config = OmegaConf.to_container(config)
     print('Config:\n', json.dumps(config, indent=4))
+
+    config['OUTPUT_DIR'] = get_current_hydra_output_dir()
 
     algorithm = config.get('ALGORITHM', 'MAPPO')
     if algorithm == 'MAPPO':

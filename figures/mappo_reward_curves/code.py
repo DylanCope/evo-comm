@@ -12,11 +12,7 @@ matplotlib.use("pdf")
 def plot(data):
     set_plotting_style()
     sns.lineplot(
-        data=data,
-        x="total_env_steps",
-        y="mean_total_reward",
-        hue="N_OVERLAPPING_SOUNDS",
-        palette=sns.color_palette("mako_r", 3),
+        data=data, x="total_env_steps", y="mean_total_reward", hue="overlapping_sounds"
     )
     plt.xlabel("Steps")
     plt.ylabel("Mean total reward")
