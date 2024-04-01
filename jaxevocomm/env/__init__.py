@@ -14,19 +14,17 @@ def make_env(config: dict):
 
     elif env_name == "MimicryCommEnvGridworld":
         overlapping_sounds = config.get('N_OVERLAPPING_SOUNDS', 0)
-        total_sounds = config['N_TOTAL_SOUNDS']
-        agent_sounds = (total_sounds - overlapping_sounds) // 2
-        prey_sounds = total_sounds - agent_sounds - overlapping_sounds
-
-        config['N_AGENT_SOUNDS'] = agent_sounds
-        config['N_PREY_SOUNDS'] = prey_sounds
+        agent_only_sounds = config['N_AGENT_SOUNDS'] - overlapping_sounds
+        prey_only_sounds = config['N_PREY_SOUNDS'] - overlapping_sounds
+        prey_noise_prob = config.get('PREY_NOISE_PROB', 0.25)
 
         env = MimicryCommEnvGridworld(grid_size=config['GRID_SIZE'],
                                       n_agents=config['N_AGENTS'],
                                       n_prey=config['N_PREY'],
+                                      prey_noise_prob=prey_noise_prob,
                                       n_overlapping_sounds=overlapping_sounds,
-                                      n_agent_only_sounds=agent_sounds,
-                                      n_prey_only_sounds=prey_sounds,)
+                                      n_agent_only_sounds=agent_only_sounds,
+                                      n_prey_only_sounds=prey_only_sounds,)
         env = MPELogWrapper(env)
         return env
 

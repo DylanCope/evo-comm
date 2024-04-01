@@ -3,21 +3,23 @@ defaults:
   - _self_
 
 ALGORITHM: "EVO"
+SEED: 1
 
+# Evo Params
 NUM_ENVS: 16 
 NUM_STEPS: 256
 TOTAL_GENERATIONS: 10000
 POP_SIZE: 256
 EVO_STRATEGY: "SimpleGA" # evosax.Strategies
 
-SEED: 1
-
+# Env Params
 ENV_NAME: "MimicryCommEnvGridworld"
 GRID_SIZE: 5
 N_AGENTS: 2
 N_PREY: 1
-N_TOTAL_SOUNDS: 10
-N_OVERLAPPING_SOUNDS: 10
+N_AGENT_SOUNDS: 5
+N_PREY_SOUNDS: 5
+N_OVERLAPPING_SOUNDS: 1
 
 # WandB Params
 WANDB_MODE: "online"

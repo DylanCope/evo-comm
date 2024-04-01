@@ -43,11 +43,12 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
                  n_overlapping_sounds: int = 2,
                  n_agent_only_sounds: int = 2,
                  n_prey_only_sounds: int = 2,
-                 prey_vision_range: int = 1,
-                 prey_sound_range: int = 5,
+                 prey_visible_range: int = 1,
+                 prey_audible_range: int = 5,
                  prey_noise_prob: float = 0.25,
                  max_steps: int = 50,
                  agents_to_capture_prey: int = 2,
+                 observe_other_agents_pos: bool = True,
                  capture_reward: float = 10.0,
                  time_penalty: float = 0.1,
                  **kwargs):
@@ -58,13 +59,14 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
         self.n_overlapping_sounds = n_overlapping_sounds
         self.n_agent_only_sounds = n_agent_only_sounds
         self.n_prey_only_sounds = n_prey_only_sounds
-        self.prey_sound_range = prey_sound_range
-        self.prey_vision_range = prey_vision_range
+        self.prey_audible_range = prey_audible_range
+        self.prey_visible_range = prey_visible_range
         self.prey_noise_prob = prey_noise_prob
         self.max_steps = max_steps
         self.agents_to_capture_prey = agents_to_capture_prey
         self.capture_reward = capture_reward
         self.time_penalty = time_penalty
+        self.observe_other_agents_pos = observe_other_agents_pos
 
         self.agents = [
             f'agent_{i}' for i in range(self.n_agents)
@@ -161,7 +163,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
                 is_silent_sound = sound_idx == 0
                 prey_pos = state.prey_pos[prey_idx]
                 prey_dist = jnp.sum(jnp.abs(agent_pos - prey_pos))
-                in_audible_range = prey_dist <= self.prey_sound_range
+                in_audible_range = prey_dist <= self.prey_audible_range
                 axis_factor = jnp.sign(agent_pos[axis] - prey_pos[axis])
                 axis_sound_feat = axis_sound_feat + (
                     (1.0 - is_silent_sound) * in_audible_range * axis_factor * prey_sound
@@ -193,16 +195,25 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
 
         agent_idx = self.agents.index(agent)
         agent_pos = state.agent_pos[agent_idx]
-
         agent_pos_x_1h = jax.nn.one_hot(agent_pos[X], self.grid_size).flatten()
         agent_pos_y_1h = jax.nn.one_hot(agent_pos[Y], self.grid_size).flatten()
-
         features['agent_pos_x'] = agent_pos_x_1h
         features['agent_pos_y'] = agent_pos_y_1h
 
+        if self.observe_other_agents_pos:
+            for other_agent_idx in range(self.n_agents):
+                if other_agent_idx != agent_idx:
+                    other_agent_pos = state.agent_pos[other_agent_idx]
+                    other_agent_pos_x_1h = jax.nn.one_hot(other_agent_pos[X],
+                                                          self.grid_size).flatten()
+                    other_agent_pos_y_1h = jax.nn.one_hot(other_agent_pos[Y],
+                                                          self.grid_size).flatten()
+                    features[f'other_agent_{other_agent_idx}_pos_x'] = other_agent_pos_x_1h
+                    features[f'other_agent_{other_agent_idx}_pos_y'] = other_agent_pos_y_1h
+
         for prey_i, prey_pos in enumerate(state.prey_pos):
             manhattan_dist = jnp.sum(jnp.abs(agent_pos - prey_pos))
-            is_visible_mask = manhattan_dist <= self.prey_vision_range
+            is_visible_mask = manhattan_dist <= self.prey_visible_range
             prey_pos_x_1h = jax.nn.one_hot(prey_pos[X], self.grid_size).flatten()
             prey_pos_y_1h = jax.nn.one_hot(prey_pos[Y], self.grid_size).flatten()
             features[f'prey_{prey_i}_pos_x'] = is_visible_mask * prey_pos_x_1h
