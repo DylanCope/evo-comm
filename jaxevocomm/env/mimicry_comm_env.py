@@ -22,7 +22,6 @@ class State:
 
 class GridAction:
     N_ACTIONS = 5
-
     NOOP = 0
     UP = 1
     DOWN = 2
