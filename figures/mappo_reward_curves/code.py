@@ -16,19 +16,19 @@ def plot(data):
     )
     plt.xlabel("Steps")
     plt.ylabel("Mean total reward")
-    plt.legend(title="Overlapping\nSounds")
+    plt.legend(title="Overlapping\nSignals")
 
 
 def reproduce_figure():
     data = [
         pd.read_csv(csv_path)
-        for csv_path in Path("figures/overlapping_sounds_reward_curves").glob(
+        for csv_path in Path("figures/mappo_reward_curves").glob(
             "data_*.csv"
         )
     ]
     plot(*data)
     plt.savefig(
-        "figures/overlapping_sounds_reward_curves/overlapping_sounds_reward_curves.pdf",
+        "figures/mappo_reward_curves/mappo_reward_curves.pdf",
         bbox_inches="tight",
         dpi=1000,
     )
