@@ -280,3 +280,54 @@ def test_observe_prey_vision():
             else:
                 assert (prey_feat_x == 0).all()
                 assert (prey_feat_y == 0).all()
+
+
+def test_prey_audible():
+    n_agents = 1
+    n_prey = 1
+    grid_size = 5
+
+    agent_x, agent_y = 2, 2
+    grid_positions = list(product(range(grid_size), range(grid_size)))
+
+    sound_val = 1
+
+    def check_sound_heard(feats, source_x, source_y):
+        if source_x < agent_x:
+            assert feats['sound_feat_right'][sound_val - 1] == 1
+        elif source_x == agent_x:
+            assert feats['sound_feat_right'][sound_val - 1] == 0
+            assert feats['sound_feat_left'][sound_val - 1] == 0
+        else:
+            assert feats['sound_feat_left'][sound_val - 1] == 1
+
+        if source_y < agent_y:
+            assert feats['sound_feat_up'][sound_val - 1] == 1
+        elif source_y == agent_y:
+            assert feats['sound_feat_up'][sound_val - 1] == 0
+            assert feats['sound_feat_down'][sound_val - 1] == 0
+        else:
+            assert feats['sound_feat_down'][sound_val - 1] == 1
+
+    for prey_audible_range in range(0, grid_size + 1):
+        env = MimicryCommEnvGridworld(grid_size=grid_size,
+                                      n_agents=n_agents,
+                                      n_prey=n_prey,
+                                      prey_audible_range=prey_audible_range)
+
+        for prey_x, prey_y in grid_positions:
+            state = create_state(
+                agent_positions={'agent_0': (agent_x, agent_y)},
+                prey_positions={'prey_0': (prey_x, prey_y)},
+                messages={'prey_0': sound_val}
+            )
+
+            feats = env._create_sound_feats(state, 'agent_0')
+            
+            dist = abs(prey_x - agent_x) + abs(prey_y - agent_y)
+
+            if dist <= prey_audible_range:
+                check_sound_heard(feats, prey_x, prey_y)
+            else:
+                for sound_feat in feats.values():
+                    assert (sound_feat == 0).all()
