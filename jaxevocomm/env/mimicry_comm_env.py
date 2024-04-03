@@ -140,10 +140,13 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
         """
         Creates sound features for a given agent.
 
-        Sound features correspond to the sounds heard by the agent along the X and Y axes.
-        Sounds are represented as one-hot vectors of the sound alphabet. Sounds that come
-        from the positive direction are represented as positive one, and sounds that come
-        from the negative direction are represented as negative one.
+        Sound features correspond to the sounds heard by the agent along
+        the X and Y axes. For each axis there are two vectors corresponding
+        to sounds coming from ahead or behind the agent along that axis.
+
+        Each sound vector is a one-hot vector with an dimension for each
+        possible sound that can be heard by the agent. The vector is all
+        zeros if the sound is silent or not sensed by the agent.
         """
         if isinstance(agent, str):
             agent_idx = self.agents.index(agent)
@@ -205,25 +208,10 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
 
         return features
 
-    def _get_agent_obs_feats(self,
-                             state: State,
-                             agent: str) -> Dict[str, jnp.ndarray]:
-        """
-        Creates observation features for a given agent, stored as a dictionary
-        of feature names to feature vectors.
-
-        Consists of agent position, prey positions, and sound features.
-        Position features are represented as one-hot vectors of the X and Y grid coordinates.
-        See _create_sound_feats for sound features.
-        
-        Args:
-            state: current environment state
-            agent: agent ID
-
-        Returns:
-            features: dictionary of feature names to feature vectors
-        """
-        features = dict()
+    def _get_position_feats(self,
+                            state: State,
+                            agent: str) -> Dict[str, chex.Array]:
+        features = {}
 
         agent_idx = self.agents.index(agent)
         agent_pos = state.agent_pos[agent_idx]
@@ -251,7 +239,28 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
             features[f'prey_{prey_i}_pos_x'] = is_visible_mask * prey_pos_x_1h
             features[f'prey_{prey_i}_pos_y'] = is_visible_mask * prey_pos_y_1h
 
-        features.update(self._create_sound_feats(state, agent_idx))
+        return features
+
+    def _get_agent_obs_feats(self,
+                             state: State,
+                             agent: str) -> Dict[str, jnp.ndarray]:
+        """
+        Creates observation features for a given agent, stored as a dictionary
+        of feature names to feature vectors.
+
+        Consists of agent position, prey positions, and sound features.
+        Position features are represented as one-hot vectors of the X and Y grid coordinates.
+        See _create_sound_feats for sound features.
+        
+        Args:
+            state: current environment state
+            agent: agent ID
+
+        Returns:
+            features: dictionary of feature names to feature vectors
+        """
+        features = self._get_position_feats(state, agent)
+        features.update(self._create_sound_feats(state, agent))
 
         return features
 
@@ -291,7 +300,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
             jax.random.bernoulli(noise_k1, self.prey_noise_prob, (self.n_prey,))
             * jax.random.randint(noise_k2, (self.n_prey,), 1, self.n_prey_sounds + 1)
         )
-        
+
         # Agent and prey sounds need to be in the same alphabet, so we add
         # the number of agent only sounds to the prey sounds 
         is_making_sound = prey_sounds != 0
