@@ -21,6 +21,8 @@ def make_env(config: dict):
         env = MimicryCommEnvGridworld(grid_size=config['GRID_SIZE'],
                                       n_agents=config['N_AGENTS'],
                                       n_prey=config['N_PREY'],
+                                      prey_audible_range=config.get('PREY_AUDIBLE_RANGE', 5),
+                                      prey_visible_range=config.get('PREY_VISIBLE_RANGE', 2),
                                       prey_noise_prob=prey_noise_prob,
                                       n_overlapping_sounds=overlapping_sounds,
                                       n_agent_only_sounds=agent_only_sounds,

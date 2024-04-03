@@ -17,14 +17,18 @@ ENV_NAME: "MimicryCommEnvGridworld"
 GRID_SIZE: 5
 N_AGENTS: 2
 N_PREY: 1
+
+# zero means only visible when agent is on the same cell as the prey
+PREY_VISIBLE_RANGE: 0 
+PREY_AUDIBLE_RANGE: 2
 N_AGENT_SOUNDS: 5
-N_PREY_SOUNDS: 5
+N_PREY_SOUNDS: 1
 N_OVERLAPPING_SOUNDS: 1
 
 # WandB Params
 WANDB_MODE: "online"
 ENTITY: "drcope"
-PROJECT: "jaxmarl-mce"
+PROJECT: "mimicry-comm"
 
 # Checkpointing
 CHECKPOINT_INTERVAL: 20

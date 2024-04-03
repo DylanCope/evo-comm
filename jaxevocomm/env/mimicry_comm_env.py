@@ -21,12 +21,16 @@ class State:
 
 
 class GridAction:
-    N_ACTIONS = 5
     NOOP = 0
     UP = 1
     DOWN = 2
     LEFT = 3
     RIGHT = 4
+
+    N_ACTIONS = 5
+    ACTIONS = [
+        NOOP, UP, DOWN, LEFT, RIGHT
+    ]
 
 
 X = 0
@@ -72,7 +76,11 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
         ]
 
         self.action_spaces = {
-            agent: Discrete(GridAction.N_ACTIONS + self.n_agent_sounds)
+            agent: Discrete(
+                GridAction.N_ACTIONS
+                + 1  # silent sound
+                + self.n_agent_sounds
+            )
             for agent in self.agents
         }
 
@@ -85,8 +93,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
 
     @property
     def n_sounds(self):
-        # first sound is special silent symbol
-        return 1 + (
+        return (
             self.n_overlapping_sounds +
             self.n_agent_only_sounds +
             self.n_prey_only_sounds
@@ -129,7 +136,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
 
     def _create_sound_feats(self,
                             state: State,
-                            agent_idx: int) -> Dict[str, chex.Array]:
+                            agent: int | str) -> Dict[str, chex.Array]:
         """
         Creates sound features for a given agent.
 
@@ -138,37 +145,63 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
         from the positive direction are represented as positive one, and sounds that come
         from the negative direction are represented as negative one.
         """
+        if isinstance(agent, str):
+            agent_idx = self.agents.index(agent)
+        else:
+            agent_idx = agent
+
         agent_pos = state.agent_pos[agent_idx]
         features = dict()
 
-        for axis in [X, Y]:
-            axis_sound_feat = jnp.zeros((self.n_sounds,))
+        feat_names = {
+            'right': (X, 1),
+            'left': (X, -1),
+            'up': (Y, 1),
+            'down': (Y, -1),
+        }
 
+        # each axis and direction combination specifies a sensor feature
+        # that detects sounds coming from either side of the agent along each axis
+        for feat_name, (axis, direction) in feat_names.items():
+
+            sound_feat = jnp.zeros((self.n_sounds,))
+
+            def _create_sound_vec(sound_val, source_pos):
+                # sounds are between 1 and n_sounds, and 0 if silent
+                sound_1h_idx = jnp.clip(sound_val - 1, 0, self.n_sounds)
+                sound_feat = jax.nn.one_hot(sound_1h_idx, self.n_sounds)
+
+                # +1 if or -1 if sound along the given axis, 0 if not
+                axis_factor = jnp.sign(agent_pos[axis] - source_pos[axis])
+
+                # +1 if sound is in the given direction along the given axis 
+                correct_direction = jnp.clip(direction * axis_factor, 0, 1)
+
+                # mask for silent sound value
+                not_silent = sound_val != 0
+
+                # vector is all zeros if silent sound or not sensed by
+                # this sound feature
+                return not_silent * correct_direction * sound_feat     
+
+            # add sounds emitted by other agents
             for other_agent_idx in range(self.n_agents):
                 if agent_idx != other_agent_idx:
-                    sound_idx = state.c[other_agent_idx]
-                    other_agent_sound = jax.nn.one_hot(sound_idx,
-                                                       self.n_sounds)
-                    is_silent_sound = sound_idx == 0
+                    sound_val = state.c[other_agent_idx]
                     other_agent_pos = state.agent_pos[other_agent_idx]
-                    axis_factor = jnp.sign(agent_pos[axis] - other_agent_pos[axis])
-                    axis_sound_feat = axis_sound_feat + (
-                        (1.0 - is_silent_sound) * axis_factor * other_agent_sound
-                    )
+                    sound_feat = sound_feat + _create_sound_vec(sound_val,
+                                                                other_agent_pos)
 
+            # add sounds emitted by prey
             for prey_idx in range(self.n_prey):
-                sound_idx = state.c[self.n_agents + prey_idx]
-                prey_sound = jax.nn.one_hot(sound_idx, self.n_sounds)
-                is_silent_sound = sound_idx == 0
+                sound_val = state.c[self.n_agents + prey_idx]
                 prey_pos = state.prey_pos[prey_idx]
                 prey_dist = jnp.sum(jnp.abs(agent_pos - prey_pos))
                 in_audible_range = prey_dist <= self.prey_audible_range
-                axis_factor = jnp.sign(agent_pos[axis] - prey_pos[axis])
-                axis_sound_feat = axis_sound_feat + (
-                    (1.0 - is_silent_sound) * in_audible_range * axis_factor * prey_sound
-                )
+                prey_sound = _create_sound_vec(sound_val, prey_pos)
+                sound_feat = sound_feat + in_audible_range * prey_sound
 
-            features[f'sound_feat_axis_{axis}'] = axis_sound_feat
+            features[f'sound_feat_{feat_name}'] = sound_feat
 
         return features
 
@@ -245,7 +278,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
         agent_sounds = jnp.array([
             self.convert_agent_action_to_sound(a)
             for a in actions.values()
-        ]).squeeze()
+        ]).reshape((self.n_agents,))
 
         # Create prey Sounds
         key, noise_k1, noise_k2 = jax.random.split(key, 3)

@@ -1,1 +1,1 @@
-python train.py -cn mce_mappo --multirun SEED=1,2,3,4 N_OVERLAPPING_SOUNDS=0,5
+python train.py -cn mce_mappo --multirun SEED=5,6,7 N_OVERLAPPING_SOUNDS=0,2

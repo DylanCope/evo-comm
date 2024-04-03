@@ -147,11 +147,30 @@ if __name__ == '__main__':
 
     STEPS = 50
 
-    env = MimicryCommEnvGridworld(2)
+    env = MimicryCommEnvGridworld(
+        grid_size=5,
+        n_agents=2,
+        n_preys=1,
+        n_overlapping_sounds=1,
+        n_agent_only_sounds=4,
+        n_prey_only_sounds=0,
+        prey_visible_range=0,
+        prey_audible_range=2
+    )
+
+    assert env.n_agent_sounds == 5
+    assert env.n_prey_sounds == 1
+
+    from jaxevocomm.env.mimicry_comm_env import GridAction
+    assert env.action_spaces['agent_0'].n == (
+        GridAction.N_ACTIONS
+        + 1  # silent sound
+        + env.n_agent_sounds
+    )
 
     progbar = tqdm.tqdm(range(STEPS), desc='Running MCE', unit='step')
 
-    key = jax.random.PRNGKey(0)
+    key = jax.random.PRNGKey(1)
     key, reset_key = jax.random.split(key)
     obs, state = env.reset(reset_key)
     progbar.update()
@@ -160,10 +179,10 @@ if __name__ == '__main__':
     total_rewards = 0
 
     for step in range(STEPS):
-        action_keys = jax.random.split(key, env.n_agents)
+        key, _rng = jax.random.split(key, env.n_agents)
         actions = {
-            agent: env.action_spaces[agent].sample(k)
-            for agent, k in zip(env.agents, action_keys)
+            'agent_0': env.action_spaces['agent_0'].sample(_rng),
+            'agent_1': step % env.action_spaces['agent_1'].n
         }
 
         key, step_key = jax.random.split(key)
