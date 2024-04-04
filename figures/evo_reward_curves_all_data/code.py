@@ -13,24 +13,24 @@ def plot(data):
     set_plotting_style()
     sns.lineplot(
         data=data,
-        x="total_env_steps",
-        y="mean_total_reward",
+        x="iteration",
+        y="max_reward",
         hue="overlapping_sounds",
-        errorbar="se",
+        errorbar="ci",
     )
-    plt.xlabel("Steps")
-    plt.ylabel("Mean total reward")
+    plt.xlabel("Generation")
+    plt.ylabel("Population Best Mean Reward")
     plt.legend(title="Overlapping\nSounds")
 
 
 def reproduce_figure():
     data = [
         pd.read_csv(csv_path)
-        for csv_path in Path("figures/mappo_reward_curves").glob("data_*.csv")
+        for csv_path in Path("figures/evo_reward_curves_all_data").glob("data_*.csv")
     ]
     plot(*data)
     plt.savefig(
-        "figures/mappo_reward_curves/mappo_reward_curves.pdf",
+        "figures/evo_reward_curves_all_data/evo_reward_curves_all_data.pdf",
         bbox_inches="tight",
         dpi=1000,
     )

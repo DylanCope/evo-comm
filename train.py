@@ -3,6 +3,7 @@ import hydra
 from omegaconf import OmegaConf
 
 from jaxevocomm.train.evo.evo_runner import EvoRunner
+from jaxevocomm.train.evo.ckpt_cb import EvoCheckpointer
 from jaxevocomm.train.mappo import MAPPO
 from jaxevocomm.train.mappo.ckpt_cb import MAPPOCheckpointer
 from jaxevocomm.utils.hydra_utils import get_current_hydra_output_dir
@@ -31,6 +32,11 @@ def create_evo_runner(config: dict):
     output_dir = config['OUTPUT_DIR']
     cb = ChainedCallback(
         WandbCallback(tags=[config['ALGORITHM'], "RNN", config["ENV_NAME"]]),
+        EvoCheckpointer(
+            output_dir / 'checkpoints',
+            max_to_keep=config.get('KEEP_CHECKPOINTS', 1),
+            save_interval_steps=config.get('CHECKPOINT_INTERVAL', 20)
+        ),
         MetricsLogger(output_dir)
     )
 

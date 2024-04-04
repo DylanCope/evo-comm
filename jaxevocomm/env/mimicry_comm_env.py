@@ -51,7 +51,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
                  prey_noise_prob: float = 0.25,
                  max_steps: int = 50,
                  agents_to_capture_prey: int = 2,
-                 observe_other_agents_pos: bool = True,
+                 observe_other_agents_pos: bool = False,
                  capture_reward: float = 10.0,
                  time_penalty: float = 0.1,
                  **kwargs):

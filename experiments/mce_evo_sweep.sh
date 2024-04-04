@@ -1,1 +1,1 @@
-python train.py -cn mce_evo --multirun SEED=0,1,2 N_OVERLAPPING_SOUNDS=0,1
+python train.py -cn mce_evo --multirun N_AGENT_SOUNDS=5,10 SEED=0,1,2,4,5 N_OVERLAPPING_SOUNDS=0,1
