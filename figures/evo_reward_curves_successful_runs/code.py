@@ -16,23 +16,21 @@ def plot(data):
         x="iteration",
         y="max_reward",
         hue="overlapping_sounds",
-        errorbar="ci",
+        errorbar="se",
     )
     plt.xlabel("Generation")
     plt.ylabel("Population Best Mean Reward")
-    plt.legend(title="Overlapping\nSounds")
+    plt.legend(title="Signal\nOverlap?")
 
 
 def reproduce_figure():
     data = [
         pd.read_csv(csv_path)
-        for csv_path in Path("figures/evo_reward_curves_all_data").glob("data_*.csv")
+        for csv_path in Path("figures/evo_reward_curves_successful_runs").glob("data_*.csv")
     ]
     plot(*data)
     plt.savefig(
-        "figures/evo_reward_curves_all_data/evo_reward_curves_all_data.pdf",
-        bbox_inches="tight",
-        dpi=1000,
+        "figures/evo_reward_curves_successful_runs/evo_reward_curves.pdf", bbox_inches="tight", dpi=1000
     )
 
 

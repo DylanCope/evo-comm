@@ -11,6 +11,7 @@ matplotlib.use("pdf")
 
 def plot(data):
     set_plotting_style()
+    data = data[data.total_env_steps <= 5e6]
     sns.lineplot(
         data=data,
         x="total_env_steps",
@@ -20,7 +21,7 @@ def plot(data):
     )
     plt.xlabel("Steps")
     plt.ylabel("Mean total reward")
-    plt.legend(title="Overlapping\nSounds")
+    plt.legend(title="Signal Overlap?")
 
 
 def reproduce_figure():
@@ -32,7 +33,7 @@ def reproduce_figure():
     plt.savefig(
         "figures/mappo_reward_curves/mappo_reward_curves.pdf",
         bbox_inches="tight",
-        dpi=1000,
+        dpi=300,
     )
 
 
