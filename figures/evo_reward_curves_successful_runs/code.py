@@ -17,9 +17,10 @@ def plot(data):
         y="max_reward",
         hue="overlapping_sounds",
         errorbar="se",
+        palette=[sns.color_palette()[1], sns.color_palette()[2]],
     )
     plt.xlabel("Generation")
-    plt.ylabel("Population Best Mean Reward")
+    plt.ylabel("Population best mean reward")
     plt.legend(title="Signal\nOverlap?")
 
 
