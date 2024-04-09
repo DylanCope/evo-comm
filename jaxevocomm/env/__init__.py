@@ -29,6 +29,7 @@ def make_env(config: dict):
             n_agent_only_sounds=agent_only_sounds,
             n_prey_only_sounds=prey_only_sounds,
             observe_other_agents_pos=config.get('OBSERVE_OTHER_AGENTS_POS', False),
+            on_prey_reward=config.get('ON_PREY_REWARD', 0.0),
         )
         env = MPELogWrapper(env)
         return env

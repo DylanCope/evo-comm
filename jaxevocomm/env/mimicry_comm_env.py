@@ -53,6 +53,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
                  agents_to_capture_prey: int = 2,
                  observe_other_agents_pos: bool = False,
                  capture_reward: float = 10.0,
+                 on_prey_reward: float = 0.0,
                  time_penalty: float = 0.1,
                  **kwargs):
         super(MimicryCommEnvGridworld, self).__init__(num_agents = n_agents)
@@ -67,6 +68,7 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
         self.prey_noise_prob = prey_noise_prob
         self.max_steps = max_steps
         self.agents_to_capture_prey = agents_to_capture_prey
+        self.on_prey_reward = on_prey_reward
         self.capture_reward = capture_reward
         self.time_penalty = time_penalty
         self.observe_other_agents_pos = observe_other_agents_pos
@@ -112,6 +114,13 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
             self.n_overlapping_sounds +
             self.n_agent_only_sounds
         )
+
+    def get_agent_sounds(self):
+        return list(range(1, 1 + self.n_agent_sounds))
+
+    def get_overlapping_sounds(self):
+        return list(range(1 + self.n_agent_only_sounds,
+                          1 + self.n_agent_only_sounds + self.n_overlapping_sounds))
 
     @partial(jax.jit, static_argnums=(0,))
     def reset(self, key: chex.PRNGKey) -> Tuple[Dict[str, chex.Array], State]:
@@ -362,7 +371,11 @@ class MimicryCommEnvGridworld(MultiAgentEnv):
             ))
             prey_captured = n_agent_on_prey >= self.agents_to_capture_prey
             total_prey_captured = total_prey_captured + prey_captured
-            reward = reward + prey_captured.squeeze() * self.capture_reward
+            reward = (
+                reward
+                + prey_captured.squeeze() * self.capture_reward
+                + n_agent_on_prey.squeeze() * self.on_prey_reward
+            )
 
             # randomly move prey to a new position if captured
             key, new_prey_pos_key = jax.random.split(key)

@@ -5,6 +5,9 @@ Adapted from https://github.com/FLAIROx/JaxMARL/blob/main/baselines/MAPPO/mappo_
 """
 
 from .mappo_state_wrapper import MAPPOWorldStateWrapper
+from .mappo_transition import Transition, batchify, unbatchify, unbatchify_traj_batch
+from .metrics import episode_metrics
+
 from jaxevocomm.env import make_env
 from jaxevocomm.train.callback import ChainedCallback, TrainerCallback
 from jaxevocomm.models import ScannedRNN, ActorRNN, CriticRNN
@@ -12,7 +15,7 @@ from jaxevocomm.train.mappo.ckpt_cb import load_best_ckpt
 
 from pathlib import Path
 import numpy as np
-from typing import Any, List, NamedTuple, Dict, Tuple
+from typing import Any, List, Dict, Tuple
 from functools import partial
 
 import jax
@@ -21,71 +24,6 @@ from omegaconf import OmegaConf
 import optax
 from flax.training.train_state import TrainState
 from flax import struct, core
-
-
-class Transition(NamedTuple):
-    global_done: jnp.ndarray
-    done: jnp.ndarray
-    action: jnp.ndarray
-    value: jnp.ndarray
-    reward: jnp.ndarray
-    log_prob: jnp.ndarray
-    obs: core.FrozenDict[str, jnp.ndarray]
-    world_state: jnp.ndarray
-    info: jnp.ndarray
-    env_state: struct.dataclass
-
-
-def batchify(x: Dict[str, jnp.ndarray],
-             agent_ids: List[str],
-             num_actors: int) -> jnp.ndarray:
-    x = jnp.stack([x[a] for a in agent_ids])
-    return x.reshape((num_actors, -1))
-
-
-def unbatchify(x: jnp.ndarray,
-               agent_ids: List[str],
-               num_envs: int) -> Dict[str, jnp.ndarray]:
-    num_agents = len(agent_ids)
-    x = x.reshape((num_agents, num_envs, -1))
-    return {a: x[i] for i, a in enumerate(agent_ids)}
-
-
-def unbatchify_traj_batch(traj_batch: Transition,
-                          agent_ids: List[str]) -> Dict[str, Transition]:
-    n_agents = len(agent_ids)
-    n_steps, batch_size = traj_batch.done.shape
-    n_envs = batch_size // n_agents
-
-    def _unbatchify(x):
-        return x.reshape((n_steps, n_agents, n_envs, -1)).squeeze()
-
-    global_done = _unbatchify(traj_batch.global_done)
-    done = _unbatchify(traj_batch.done)
-    action = _unbatchify(traj_batch.action)
-    value = _unbatchify(traj_batch.value)
-    reward = _unbatchify(traj_batch.reward)
-    log_prob = _unbatchify(traj_batch.log_prob)
-    world_state = _unbatchify(traj_batch.world_state)
-    info = jax.tree_map(_unbatchify, traj_batch.info)
-
-    return {
-        a: Transition(
-            global_done=global_done[:, i],
-            done=done[:, i],
-            action=action[:, i],
-            value=value[:, i],
-            reward=reward[:, i],
-            log_prob=log_prob[:, i],
-            obs=traj_batch.obs[:, i],
-            world_state=world_state[:, i],
-            info={
-                k: v[:, i] for k, v in info.items()
-            },
-            env_state=traj_batch.env_state
-        )
-        for i, a in enumerate(agent_ids)
-    }    
 
 
 class MAPPOTrainState(struct.PyTreeNode):
@@ -148,10 +86,12 @@ class MAPPO:
 
     def __init__(self,
                  config: dict,
+                 metrics: List[callable] = None,
                  callback: TrainerCallback | List[TrainerCallback] = None):
         self.config = config
         self.env = MAPPOWorldStateWrapper(make_env(config))
         self.rng = jax.random.PRNGKey(config["SEED"])
+        self.metrics = metrics or [episode_metrics]
 
         if isinstance(callback, list):
             self.callback = ChainedCallback(*callback)
@@ -544,7 +484,6 @@ class MAPPO:
         rng, runner_state = runner_state.next_rng()
         permutation = jax.random.permutation(rng, self.config["NUM_ACTORS"])
 
-
         shuffled_batch = jax.tree_util.tree_map(
             lambda x: jnp.take(x, permutation, axis=1), batch
         )
@@ -578,27 +517,8 @@ class MAPPO:
     def _compute_metrics(self,
                          trajectories: Dict[str, Transition]) -> Dict[str, jnp.ndarray]:
         metrics = {}
-        agent_0, *_ = self.env.agents
-        metrics['num_episodes'] = trajectories[agent_0].global_done.sum()
-
-        def _create_row_done_mask(dones):
-            return jax.lax.scan(
-                lambda found_done, is_done: (is_done | found_done, is_done | found_done),
-                False, dones, reverse=True
-            )[::-1]
-
-        dones_mask, _ = jax.vmap(
-            _create_row_done_mask, in_axes=(1,)
-        )(trajectories[agent_0].global_done)
-        dones_mask = dones_mask.transpose()
-
-        metrics['mean_total_reward'] = (
-            (dones_mask * trajectories[agent_0].reward).sum() / metrics['num_episodes']
-        )
-        metrics['n_env_steps'] = np.prod(trajectories[agent_0].global_done.shape)
-        metrics['mean_episode_length'] = (
-            dones_mask.sum() / metrics['num_episodes']
-        )
+        for metric in self.metrics:
+            metrics.update(metric(self.env, trajectories))
         return metrics
 
     def _training_iteration(self, runner_state: MAPPOTrainState):

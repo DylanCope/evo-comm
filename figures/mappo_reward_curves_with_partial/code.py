@@ -11,6 +11,7 @@ matplotlib.use("pdf")
 
 def plot(data):
     set_plotting_style()
+    data = data[data.total_env_steps <= 5e6]
     sns.lineplot(
         data=data,
         x="total_env_steps",
@@ -34,7 +35,7 @@ def reproduce_figure():
     plt.savefig(
         "figures/mappo_reward_curves_with_partial/mappo_reward_curves_with_partial.pdf",
         bbox_inches="tight",
-        dpi=1000,
+        dpi=300,
     )
 
 

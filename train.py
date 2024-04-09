@@ -6,6 +6,7 @@ from jaxevocomm.train.evo.evo_runner import EvoRunner
 from jaxevocomm.train.evo.ckpt_cb import EvoCheckpointer
 from jaxevocomm.train.mappo import MAPPO
 from jaxevocomm.train.mappo.ckpt_cb import MAPPOCheckpointer
+from jaxevocomm.train.mappo.metrics import episode_metrics, mce_metrics
 from jaxevocomm.utils.hydra_utils import get_current_hydra_output_dir
 from jaxevocomm.train.callback import (
     ChainedCallback, WandbCallback, MetricsLogger
@@ -25,7 +26,9 @@ def create_mappo_trainer(config: dict):
         MetricsLogger(output_dir)
     )
 
-    return MAPPO(config, cb)
+    metrics = [episode_metrics, mce_metrics]
+
+    return MAPPO(config, metrics, cb)
 
 
 def create_evo_runner(config: dict):
