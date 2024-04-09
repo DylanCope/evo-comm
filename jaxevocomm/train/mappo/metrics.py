@@ -45,18 +45,19 @@ def mce_metrics(env: MimicryCommEnvGridworld,
     # each row is a step, and the first columns are the agent communication states
     comm_state = trajectories[agent_0].env_state.c
 
-    for agent_i, agent in enumerate(env.agents):
-        for sound_val in env.get_agent_sounds():
-            agent_comm_state = comm_state[:, agent_i]
-            # ignore silent states to just get messages
-            agent_msgs = agent_comm_state[agent_comm_state != 0]
-            sound_freq = (agent_msgs == sound_val).mean()
-            metrics[f'{agent}_sound_{sound_val}_freq'] = sound_freq
+    # for agent_i, agent in enumerate(env.agents):
+    #     for sound_val in env.get_agent_sounds():
+    #         agent_comm_state = comm_state[:, agent_i]
+    #         # ignore silent states to just get messages
+    #         agent_msgs = agent_comm_state[agent_comm_state != 0]
+    #         sound_freq = (agent_msgs == sound_val).mean()
+    #         metrics[f'{agent}_sound_{sound_val}_freq'] = sound_freq
 
     agents_comm_state = comm_state[:, :env.n_agents]
-    agents_msgs = agents_comm_state[agents_comm_state != 0]
     overlap_sounds = jnp.array(env.get_overlapping_sounds())
-    overlap_freq = jnp.isins(agents_msgs, overlap_sounds).mean()
+    n_overlap_use = jnp.isins(agents_comm_state, overlap_sounds).sum()
+    n_not_silent = agents_comm_state[agents_comm_state != 0].sum()
+    overlap_freq = n_overlap_use / n_not_silent
     metrics['use_overlap_freq'] = overlap_freq
 
     metrics['silent_freq'] = (agents_comm_state == 0).mean()
