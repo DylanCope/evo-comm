@@ -6,7 +6,6 @@ import json
 
 import numpy as np
 import orbax.checkpoint as ocp
-from flax.training import orbax_utils
 from flax import struct, core
 
 

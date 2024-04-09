@@ -6,7 +6,7 @@ Adapted from https://github.com/FLAIROx/JaxMARL/blob/main/baselines/MAPPO/mappo_
 
 from .mappo_state_wrapper import MAPPOWorldStateWrapper
 from .mappo_transition import Transition, batchify, unbatchify, unbatchify_traj_batch
-from .metrics import episode_metrics
+from .metrics import performance_metrics
 
 from jaxevocomm.env import make_env
 from jaxevocomm.train.callback import ChainedCallback, TrainerCallback
@@ -91,7 +91,7 @@ class MAPPO:
         self.config = config
         self.env = MAPPOWorldStateWrapper(make_env(config))
         self.rng = jax.random.PRNGKey(config["SEED"])
-        self.metrics = metrics or [episode_metrics]
+        self.metrics = metrics or [performance_metrics]
 
         if isinstance(callback, list):
             self.callback = ChainedCallback(*callback)
@@ -473,7 +473,7 @@ class MAPPO:
         init_hstates = jax.tree_map(lambda x: jnp.reshape(
             x, (self.config["NUM_STEPS"], self.config["NUM_ACTORS"])
         ), init_hstates)
-        
+
         batch = (
             init_hstates[0],
             init_hstates[1],
