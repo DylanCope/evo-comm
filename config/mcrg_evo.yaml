@@ -1,0 +1,36 @@
+defaults:
+  - override hydra/launcher: slurm_launcher
+  - _self_
+
+ALGORITHM: "EVO"
+SEED: 1
+
+# Evo Params
+NUM_ENVS: 16 
+NUM_STEPS: 256
+TOTAL_GENERATIONS: 10000
+POP_SIZE: 256
+EVO_STRATEGY: "SimpleGA" # evosax.Strategies
+
+# Env Params
+ENV_NAME: "MimicryCommEnvGridworld"
+GRID_SIZE: 5
+N_AGENTS: 2
+N_PREY: 1
+
+# zero means only visible when agent is on the same cell as the prey
+PREY_VISIBLE_RANGE: 0 
+PREY_AUDIBLE_RANGE: 2
+N_AGENT_SOUNDS: 5
+N_PREY_SOUNDS: 1
+N_OVERLAPPING_SOUNDS: 1
+OBSERVE_OTHER_AGENTS_POS: False
+
+# WandB Params
+WANDB_MODE: "online"
+ENTITY: "drcope"
+PROJECT: "mimicry-comm"
+
+# Checkpointing
+CHECKPOINT_INTERVAL: 100
+KEEP_CHECKPOINTS: 3

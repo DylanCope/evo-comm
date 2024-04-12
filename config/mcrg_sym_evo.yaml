@@ -1,0 +1,28 @@
+defaults:
+  - override hydra/launcher: slurm_launcher
+  - _self_
+
+ALGORITHM: "EVO"
+SEED: 1
+
+# Evo Params
+NUM_ENVS: 16 
+NUM_STEPS: 256
+TOTAL_GENERATIONS: 1000
+POP_SIZE: 128
+EVO_STRATEGY: "SimpleGA" # evosax.Strategies
+
+# Env Params
+ENV_NAME: "MimicryCommReferentialGameSymmetric"
+N_ACTIONS: 100
+EXTERNAL_SOURCE_PROB: 0.5
+ANNEAL_EXTERNAL_SOURCE: True
+
+# WandB Params
+WANDB_MODE: "online"
+ENTITY: "drcope"
+PROJECT: "mimicry-comm-refgame"
+
+# Checkpointing
+CHECKPOINT_INTERVAL: 20
+KEEP_CHECKPOINTS: 3

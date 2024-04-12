@@ -2,6 +2,8 @@ import jaxmarl
 from jaxmarl.wrappers.baselines import MPELogWrapper
 
 from jaxevocomm.env.mimicry_comm_env import MimicryCommEnvGridworld
+from jaxevocomm.env.mimicry_ref_game import MimicryCommReferentialGame
+from jaxevocomm.env.mimicry_ref_game_sym import MimicryCommReferentialGameSymmetric
 
 
 def make_env(config: dict):
@@ -31,6 +33,23 @@ def make_env(config: dict):
             observe_other_agents_pos=config.get('OBSERVE_OTHER_AGENTS_POS', False),
             on_prey_reward=config.get('ON_PREY_REWARD', 0.0),
         )
+        env = MPELogWrapper(env)
+        return env
+
+    elif env_name == 'MimicryCommReferentialGame':
+        n_actions = config['N_ACTIONS']
+        external_source_prob = config.get('EXTERNAL_SOURCE_PROB', 0.0)
+        env = MimicryCommReferentialGame(n_actions,
+                                         external_source_prob=external_source_prob)
+        env = MPELogWrapper(env)
+        return env
+
+    elif env_name == 'MimicryCommReferentialGameSymmetric':
+        n_actions = config['N_ACTIONS']
+        external_source_prob = config.get('EXTERNAL_SOURCE_PROB', 0.0)
+        env = MimicryCommReferentialGameSymmetric(
+            n_actions,
+            external_source_prob=external_source_prob)
         env = MPELogWrapper(env)
         return env
 
