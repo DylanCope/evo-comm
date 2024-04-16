@@ -10,7 +10,10 @@ matplotlib.use("pdf")
 
 
 def plot(data):
-    set_plotting_style()
+    set_plotting_style(font_scale=2)
+
+    plt.figure(figsize=(7, 5))
+
     sns.lineplot(
         data=data,
         x="iteration",
@@ -21,7 +24,7 @@ def plot(data):
     )
     plt.xlabel("Generation")
     plt.ylabel("Population best mean reward")
-    plt.legend(title="Signal\nOverlap?")
+    plt.legend(title="Signal\nOverlap?", fontsize=16)
 
 
 def reproduce_figure():

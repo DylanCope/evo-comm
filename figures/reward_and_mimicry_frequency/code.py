@@ -11,9 +11,9 @@ matplotlib.use("pdf")
 
 
 def plot_reward_and_mimicry_frequency(adjusted_df):
-    set_plotting_style()
+    set_plotting_style(font_scale=2.5)
 
-    _, ax = plt.subplots(figsize=(10, 6))
+    _, ax = plt.subplots(figsize=(8, 6))
     twin_ax = ax.twinx()
 
     sns.lineplot(
@@ -43,7 +43,10 @@ def plot_reward_and_mimicry_frequency(adjusted_df):
         Line2D([0], [0], color=sns.color_palette()[1], lw=4),
     ]
 
-    twin_ax.legend(custom_lines, ["Reward", "Mimicry Frequency"], loc="lower right")
+    twin_ax.legend(custom_lines,
+                   ["Reward", "Mimicry Frequency"],
+                   loc="lower right",
+                   fontsize=18,)
 
 
 def reproduce_figure():
