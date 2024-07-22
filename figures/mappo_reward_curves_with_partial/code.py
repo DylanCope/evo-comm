@@ -10,7 +10,8 @@ matplotlib.use("pdf")
 
 
 def plot(data):
-    set_plotting_style()
+    set_plotting_style(font_scale=2)
+    plt.figure(figsize=(7, 5))
     data = data[data.total_env_steps <= 5e6]
     sns.lineplot(
         data=data,
@@ -21,7 +22,7 @@ def plot(data):
     )
     plt.xlabel("Steps")
     plt.ylabel("Mean total reward")
-    plt.legend(title="Overlap Mode")
+    plt.legend(title="Overlap Mode", fontsize=16)
 
 
 def reproduce_figure():
