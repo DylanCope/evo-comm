@@ -22,12 +22,15 @@ class ActorRNN(nn.Module):
         rnn_in = (embedding, dones)
         hidden, embedding = ScannedRNN()(hidden, rnn_in)
 
-        actor_mean = nn.Dense(128, kernel_init=orthogonal(2), bias_init=constant(0.0))(
+        actor_mean = nn.Dense(128, kernel_init=orthogonal(2),
+                              bias_init=constant(0.0))(
             embedding
         )
         actor_mean = nn.relu(actor_mean)
         action_logits = nn.Dense(
-            self.action_dim, kernel_init=orthogonal(0.01), bias_init=constant(0.0)
+            self.action_dim,
+            kernel_init=orthogonal(0.01), 
+            bias_init=constant(0.0)
         )(actor_mean)
 
         pi = distrax.Categorical(logits=action_logits)
